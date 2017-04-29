@@ -1,0 +1,123 @@
+{% extends 'manati_ui/base.html' %}
+{% block title %}
+    <div class="row">
+        <div class="col-md-10">
+
+            New Profile Session - <span id="weblogfile-name"></span><input type="text" maxlength="60" id="edit-input" />
+            <a id="sync-db-btn" style="display: none;" href="#" class="btn btn-success"><i class="fa fa-refresh" aria-hidden="true"></i> Sync</a>
+            {% load staticfiles %}
+            <img id="loading-img" width="33" style="display: none;" src="{% static 'manati_ui/images/ajax-loader.gif' %}"/>
+        </div>
+        <div class="col-md-2 ">
+            {% if user.is_authenticated %}
+                <div id="public-btn">
+                    <input type="checkbox"  {{ analysissession.public|yesno:"checked,''" }} data-toggle="toggle"
+                           data-on="<i class='fa fa-share-alt'></i> is Public"
+                           data-off="<i class='fa fa-ban'></i> No Public"
+                           data-onstyle="success" data-offstyle="danger" id="share-checkbox" >
+
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+{% endblock %}
+{% block content %}
+    <div class="row" id="analysis-session-page">
+        <div class="col-md-9 col-md-offset-3" id="wrap-form-upload-file">
+            <form enctype="multipart/form-data" role="form" class="form-inline">
+                <div class="form-group">
+                   <h4>Add Profile file</h4>
+
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <label class="input-group-btn">
+                            <span class="btn btn-success">
+                                Browse&hellip; <input type="file" id="visualize_profile" style="display: none;" multiple>
+                            </span>
+                        </label>
+                        <input type="text" class="form-control" readonly>
+                    </div>
+{#                    <button onclick="abortRead();">Cancel read</button>#}
+{#                    <div id="progress_bar"><div class="percent">0%</div></div>#}
+{#                    <input type="button" id="upload" class="btn btn-default" value="Upload File"/>#}
+                    {% if user.is_authenticated %}
+                        <input type="button" id="save-table" class="btn btn-primary" value="Save!" />
+                    {% endif %}
+
+
+
+{#                    <progress></progress>#}
+
+                </div>
+                <div class="form-group">
+                    <div id="loading-circle" style="margin-bottom: 39px"></div>
+                </div>
+
+            </form>
+        </div>
+        <div id="jsontext" style="display: none;">
+            <h2>JSON</h2>
+            <p class="rawjson"> placeholder</p>
+        </div>
+        <div id='jsonviz'></div>
+
+        <div id="regions_div" style="width: 900px; height: 500px;"></div>
+
+        <div class="col-md-12">
+            <div class="panel panel-default" id="panel-datatable">
+                <div class="panel-body">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#home" data-toggle="tab">Home</a>
+                        </li>
+                        <li id="statical-nav" style="display: none;"><a href="#statical-section" data-toggle="tab">Statistics Section</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        <li id="coments-as-nav" style="display: none;"><a href="#comment-section" data-toggle="tab">Comments</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <br/>
+                            {% include 'manati_ui/analysis_session/table_options.html' %}
+                            <table class="table table-striped table-bordered table-hover weblogs-datatable"  cellspacing="0" width="100%" id="weblogs-datatable">
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="statical-section"></div>
+                        {% if user.is_authenticated %}
+                        <div class="tab-pane fade" id="comment-section">
+                            <form  method="POST" id="comment-form" action='' class="form" method="post" role="form">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="10" maxlength="255" name="text">{{ comment.text   }}</textarea>
+                                </div>
+                            <input type="submit" class="btn btn-success" value="Update Comment" />
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    {% include 'manati_ui/analysis_session/modal_vt.html' %}
+    <style>
+    #weblogfile-name:hover{
+        cursor: pointer;
+
+    }
+    </style>
+    <script type="text/javascript">
+        VERSION_APP = '{% version_app %}';
+        var logic = new AnalysisSessionLogic();
+        logic.init();
+
+    </script>
+{% endblock %}

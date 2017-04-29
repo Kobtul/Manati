@@ -49,40 +49,54 @@ function ReaderFile(analysis_session_logic_obj){
     function handleFileSelect(evt) {
         reader = new FileReader();
         reader.onloadend = function(evt) {
+            console.log(label)
           if (evt.target.readyState == FileReader.DONE) {
-              var rows = evt.target.result.split('\n');
-              if(rows[0][0]=='#'){
-                  var i=0;
-                  var possible_headers = [];
-                  for(; i<rows.length; i++){
-                      var row = rows[i];
-                      if(row[0] == '#') possible_headers.push(row);
-                      else break;
-                  }
-                  var header = choiceHeaders(possible_headers);
-                  rows = rows.slice(i,rows.length-2); // removing the headers and the las #close comment.
-                  // in the end of the BRO files
-                  _aslo.setAnalysisSessionTypeFile('bro_http_log');
-                  rows.unshift(header);
-
-              }else{
-                  _aslo.setAnalysisSessionTypeFile('cisco_file');
+              if (label == 'json')
+              {
+                  JsonObj = JSON.parse(evt.target.result);
+                  console.log(JsonObj);
+                  _aslo.showJson(JsonObj)
               }
-              var file_rows = rows.join('\n');
-              _aslo.parseData(file_rows);
+              else {
+                  var rows = evt.target.result.split('\n');
+                  if (rows[0][0] == '#') {
+                      var i = 0;
+                      var possible_headers = [];
+                      for (; i < rows.length; i++) {
+                          var row = rows[i];
+                          if (row[0] == '#') possible_headers.push(row);
+                          else break;
+                      }
+                      var header = choiceHeaders(possible_headers);
+                      rows = rows.slice(i, rows.length - 2); // removing the headers and the las #close comment.
+                      // in the end of the BRO files
+                      _aslo.setAnalysisSessionTypeFile('bro_http_log');
+                      rows.unshift(header);
+
+                  } else if (label == 'binetflows') {
+                      _aslo.setAnalysisSessionTypeFile('argus_netflow');
+                      $.notify("BINETTTTTTTT", "info")
+                  }
+                  else {
+                      _aslo.setAnalysisSessionTypeFile('cisco_file');
+                  }
+                  var file_rows = rows.join('\n');
+                  _aslo.parseData(file_rows);
+              }
 
           }
         };
 
         // Read in the image file as a binary string.
         var file = evt.target.files[0];
+        var label = evt.target.files[0].name.split('.').pop().toLowerCase();
         thiz.eventBeforeParing(file);
         reader.readAsBinaryString(file);
 
     }
     var funcOnReady = function (){
         // _progress = document.querySelector('.percent');
-        $(document).on('change','#visualize_weblogs',handleFileSelect);
+        $(document).on('change','#visualize_weblogs,#visualize_profile',handleFileSelect);
         // document.getElementById('visualize_weblogs').addEventListener('change', handleFileSelect, false);
         $(':file').on('fileselect', function(event, numFiles, label) {
               var input = $(this).parents('.input-group').find(':text'),

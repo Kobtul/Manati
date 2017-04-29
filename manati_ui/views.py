@@ -59,6 +59,11 @@ def new_analysis_session_view(request):
     context = {}
     return render(request, 'manati_ui/analysis_session/new.html', context)
 
+@csrf_exempt
+def new_profile_session_view(request):
+    context = {}
+    return render(request, 'manati_ui/profile/new.html', context)
+
 #ajax connexions
 @login_required(login_url=REDIRECT_TO_LOGIN)
 @csrf_exempt
@@ -71,6 +76,7 @@ def create_analysis_session(request):
         u_data_list = json.loads(request.POST.get('data[]',''))
         u_key_list = json.loads(request.POST.get('headers[]',''))
         type_file = request.POST.get('type_file','')
+        print type_file
         analysis_session = AnalysisSession.objects.create(filename, u_key_list, u_data_list,current_user,type_file)
 
         if not analysis_session :

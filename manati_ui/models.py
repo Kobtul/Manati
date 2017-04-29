@@ -78,9 +78,14 @@ class AnalysisSessionManager(models.Manager):
                 for elem in weblogs:
                     i = 0
                     hash_attr = {}
-                    for k in key_list:
-                        hash_attr[k['column_name']] = elem[i]
-                        i += 1
+                    if (type_file == 'argus_netflow'):
+                        for k in key_list:
+                            hash_attr[k] = elem[i]
+                            i += 1
+                    else:
+                        for k in key_list:
+                            hash_attr[k['column_name']] = elem[i]
+                            i += 1
                     verdict = hash_attr["verdict"]
                     dt_id = hash_attr["dt_id"]
                     hash_attr.pop("db_id", None)
@@ -199,9 +204,11 @@ class RegisterStatus(enum.Enum):
 
 class AnalysisSession(TimeStampedModel):
     TYPE_FILES = Choices(('bro_http_log','BRO weblogs http.log'),
-                         ('cisco_file', 'CISCO weblogs Specific File'))
+                         ('cisco_file', 'CISCO weblogs Specific File'),
+                         ('argus_netflow','Netflow file from argus capture'))
     INFO_ATTRIBUTES = {TYPE_FILES.cisco_file: {'url':'http.url', 'ip_dist':'endpoints.server'},
-                       TYPE_FILES.bro_http_log: {'url': 'host', 'ip_dist': 'id.resp_h'}}
+                       TYPE_FILES.bro_http_log: {'url': 'host', 'ip_dist': 'id.resp_h'},
+                       TYPE_FILES.argus_netflow: {}}
 
     users = models.ManyToManyField(User, through='AnalysisSessionUsers')
     name = models.CharField(max_length=200, blank=False, null=False, default='Name by Default')

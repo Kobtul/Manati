@@ -32,7 +32,7 @@ var _verdicts_merged = ['malicious','legitimate','suspicious','undefined','false
                         'undefined_malicious','suspicious_malicious','falsepositive_malicious', 'falsepositive_suspicious',
                         'undefined_suspicious','undefined_falsepositive'];
 var NAMES_HTTP_URL = ["http.url", "http_url", "host"];
-var NAMES_END_POINTS_SERVER = ["endpoints.server", "endpoints_server", "id.resp_h"];
+var NAMES_END_POINTS_SERVER = ["endpoints.server", "endpoints_server", "id.resp_h", "DstAddr"];
 var _flows_grouped;
 var _helper;
 var _filterDataTable;
@@ -285,6 +285,7 @@ function AnalysisSessionLogic(){
         COLUMN_REG_STATUS = _data_headers_keys[COL_REG_STATUS_STR];
         COLUMN_VERDICT =  _data_headers_keys[COL_VERDICT_STR];
 
+        COL_HTTP_URL_STR = "";
         for(var index = 0; index < NAMES_HTTP_URL.length; index++){
             var key = NAMES_HTTP_URL[index];
             if(_data_headers_keys[key]!= undefined && _data_headers_keys[key] != null){
@@ -303,11 +304,18 @@ function AnalysisSessionLogic(){
         // COL_END_POINTS_SERVER_STR = "endpoints.server";
         COLUMN_HTTP_URL = _data_headers_keys[COL_HTTP_URL_STR];
         COLUMN_END_POINTS_SERVER = _data_headers_keys[COL_END_POINTS_SERVER_STR];
-        CLASS_MC_END_POINTS_SERVER_STR =  COL_END_POINTS_SERVER_STR.replace(".", "_");
-        CLASS_MC_HTTP_URL_STR = COL_HTTP_URL_STR.replace(".","_");
+        CLASS_MC_END_POINTS_SERVER_STR = COL_END_POINTS_SERVER_STR.replace(".", "_");
+        CLASS_MC_HTTP_URL_STR = COL_HTTP_URL_STR.replace(".", "_");
+
         _filterDataTable = new FilterDataTable(COLUMN_VERDICT,_verdicts_merged);
-        initDatatable(_data_headers, data_processed);
-        $('#save-table').show();
+        if(_analysis_session_type_file == "argus_netflow") {
+            saveDB(_data_headers,data_processed)
+        }
+        else {
+            initDatatable(_data_headers, data_processed);
+            $('#save-table').show();
+        }
+
 
     }
 
@@ -411,18 +419,20 @@ function AnalysisSessionLogic(){
         
         return headers;
     }
-    function saveDB(){
+    function saveDB(headers,rows){
         try{
 
             showLoading();
             $.notify("Starting process to save the Analysis Session, it takes time", "info", {autoHideDelay: 6000 });
             $('#save-table').attr('disabled',true).addClass('disabled');
-            var rows = _dt.rows();
+            rows = typeof rows !== 'undefined' ? rows : _dt.rows().data().toArray();
+            headers = typeof headers !== 'undefined' ? headers : get_headers_info();
+            //var rows = _dt.rows();
             _m.EventAnalysisSessionSavingStart(rows.length, _filename);
             var data = {
                 filename: _filename,
-                "headers[]": JSON.stringify(get_headers_info()),
-                'data[]': JSON.stringify(rows.data().toArray()),
+                "headers[]": JSON.stringify(headers),
+                'data[]': JSON.stringify(rows),
                 type_file: thiz.getAnalysisSessionTypeFile()
             };
             //send the name of the file, and the first 10 registers
@@ -438,10 +448,12 @@ function AnalysisSessionLogic(){
                     // console.log("success"); // another sanity check
                     _analysis_session_id = json['data']['analysis_session_id'];
                     setFileName(json['data']['filename']);
-                    _dt.column(COLUMN_REG_STATUS, {search:'applied'}).nodes().each( function (cell, i) {
-                        var tr = $(cell).closest('tr');
-                        if(!tr.hasClass("modified")) cell.innerHTML = 0;
-                    } );
+                    if(_analysis_session_type_file != "argus_netflow") {
+                        _dt.column(COLUMN_REG_STATUS, {search: 'applied'}).nodes().each(function (cell, i) {
+                            var tr = $(cell).closest('tr');
+                            if (!tr.hasClass("modified")) cell.innerHTML = 0;
+                        });
+                    }
                     _m.EventAnalysisSessionSavingFinished(_filename,_analysis_session_id);
                     $.notify("All Weblogs ("+json['data_length']+ ") were created successfully ", 'success');
                     $('#save-table').hide();
@@ -545,19 +557,23 @@ function AnalysisSessionLogic(){
     var _bulk_verdict;
 
     var generateContextMenuItems = function(tr_dom){
+        var items_menu = {};
+        items_menu['sep1'] = "-----------";
+        if(_analysis_session_type_file == "argus_netflow") {
+            return items_menu;
+        }
         // var tr_active = $("tr.menucontext-open.context-menu-active");
         var bigData = _dt.rows(tr_dom).data()[0];
         var ip_value = bigData[COLUMN_END_POINTS_SERVER]; // gettin end points server ip
         var url = bigData[COLUMN_HTTP_URL];
         var domain = findDomainOfURL(url); // getting domain
-        var items_menu = {};
         _bulk_marks_wbs[CLASS_MC_END_POINTS_SERVER_STR] = _helper.getFlowsGroupedBy(COL_END_POINTS_SERVER_STR,ip_value);
         _bulk_marks_wbs[CLASS_MC_HTTP_URL_STR] = _helper.getFlowsGroupedBy(COL_HTTP_URL_STR,domain);
         _bulk_verdict = bigData[COLUMN_VERDICT];
         _verdicts.forEach(function(v){
             items_menu[v] = {name: v, icon: "fa-paint-brush " + v }
         });
-        items_menu['sep1'] = "-----------";
+
         items_menu['fold1'] = {
             name: "Mark all WBs with same: ",
             icon: "fa-search-plus",
@@ -1123,7 +1139,13 @@ function AnalysisSessionLogic(){
     //INITIAL function , like a contructor
     thiz.init = function(){
         reader_files = ReaderFile(thiz);
+        google.charts.load('current', {'packages':['geochart']});
+
+        google.charts.setOnLoadCallback(regioMap);
+
+
         on_ready_fn();
+
         // window.onbeforeunload = function() {
         //     return "Dude, are you sure you want to leave? Think of the kittens!";
         // }
@@ -1137,8 +1159,48 @@ function AnalysisSessionLogic(){
         _m.EventFileUploadingStart(file.name,_size_file,_type_file);
         console.log("Parsing file...", file);
         $.notify("Parsing file...", "info");
+        //$.notify(file.type,"info")
+
+    };
+    thiz.showJson = function(json){
+        $("#jsontext").show();
+        hideLoading();
+        _m.EventFileUploadingFinished(_filename);
+        console.log(json);
+        visualizeJSONtoHTML(json);
+
+        var evt = $.Event('drawmap');
+        //evt.state = state;
+        $(window).trigger(evt);
+    };
+    function regioMap() {
+        $(window).on('drawmap', function (e) {
+            console.log('drawmap'/*, e.state*/);
+            drawRegioMap()
+        });
+    }
+    function drawRegioMap() {
+
+        var data = google.visualization.arrayToDataTable([
+          ['Country', 'Popularity'],
+          ['Germany', 200],
+          ['United States', 300],
+          ['Brazil', 400],
+          ['Canada', 500],
+          ['France', 600],
+          ['RU', 700]
+        ]);
+
+        var options = {};
+
+        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+        chart.draw(data, options);
     };
     thiz.parseData = function(file_rows){
+        $("#jsontext").hide();
+
+
         var completeFn = function (results,file){
             if (results && results.errors)
             {
@@ -1157,6 +1219,7 @@ function AnalysisSessionLogic(){
                     $.each([COL_VERDICT_STR, COL_REG_STATUS_STR, COL_DT_ID_STR],function (i, value){
                         headers.push(value);
                     });
+
                     initData(data,headers);
                     hideLoading();
                     _m.EventFileUploadingFinished(_filename, rowCount);
