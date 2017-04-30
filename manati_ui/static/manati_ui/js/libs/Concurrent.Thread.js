@@ -809,7 +809,7 @@ with ( Data.Functional ) {
         return function () {
             var VERSION = '0.5.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1001,7 +1001,7 @@ with ( Util.Arrayize ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 
 
 
@@ -1016,7 +1016,7 @@ var null_constructor = function (){};
 Function.prototype.extend = function extend ( init, props ) {
     if ( typeof init !== "function" ) throw new TypeError("function is expected: " + init);
     if ( props == null ) props = {};
-    
+
     var SuperClass = this;
     var SubClass = function ( ) {
         var self = this;
@@ -1036,7 +1036,7 @@ Function.prototype.extend = function extend ( init, props ) {
         arguments.unshift(super_call);
         return init.apply(self, arguments);
     };
-    
+
     null_constructor.prototype = SuperClass.prototype;
     var proto = SubClass.prototype = new null_constructor;
     proto.constructor = SubClass;
@@ -1050,13 +1050,13 @@ Function.prototype.extend = function extend ( init, props ) {
         }
     };
     for ( var i in props ) proto[i] = props[i];
-    
+
     return SubClass;
 };
 
 
             return {
-                
+
             };
         }();
     }
@@ -1074,7 +1074,7 @@ with ( Data.Error ) {
         return function () {
             var VERSION = '0.3.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1182,7 +1182,7 @@ with ( Data.Error ) {
         return function () {
             var VERSION = '0.3.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1264,7 +1264,7 @@ with ( Data.Iterator ) {
         return function () {
             var VERSION = '0.2.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1341,7 +1341,7 @@ with ( Data.Error ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1418,7 +1418,7 @@ with ( Data.Iterator ) {
         return function () {
             var VERSION = '0.2.1';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1490,27 +1490,27 @@ proto.isTail = function ( ) {
 };
 
 
-// Returns value of the element which is just after the position 
+// Returns value of the element which is just after the position
 // this iterator points to.
 // The default implementation merely throws UnimplementedMethodError.
-// Sub-classes must implement their own version of this method, 
+// Sub-classes must implement their own version of this method,
 // which may throws Data.Iterator.NoSuchElementError.
 proto.value = function ( ) {
     throw new UnimplementedMethodError("value", this);
 };
 
 
-// Returns a new iterator that points to the next position to the 
+// Returns a new iterator that points to the next position to the
 // one which this iterator points to.
 // The default implementation merely throws UnimplementedMethodError.
-// Sub-classes must implement their own version of this method, 
+// Sub-classes must implement their own version of this method,
 // which may throws Data.Iterator.NoSuchElementError.
 proto.next = function ( ) {
     throw new UnimplementedMethodError("next", this);
 };
 
 
-// Returns true if and only if this iterator is associated with the 
+// Returns true if and only if this iterator is associated with the
 // object specified by the argument, false otherwise.
 // The default implementation just returns false.
 proto.isBoundTo = function ( list ) {
@@ -1554,7 +1554,7 @@ with ( Data.Functional ) {
         return function () {
             var VERSION = '0.5.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1738,7 +1738,7 @@ with ( Data.Functional ) {
         return function () {
             var VERSION = '0.5.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -1933,7 +1933,7 @@ with ( Data.Iterator ) {
         return function () {
             var VERSION = '0.2.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -2008,7 +2008,7 @@ proto.isHead = function ( ) {
 };
 
 
-// Returns a new iterator that points to the previous position to 
+// Returns a new iterator that points to the previous position to
 // the one which this iterator points to.
 // The default implementation merely throws UnimplementedMethodError.
 // Sub-classes must implement their own version of this method.
@@ -2043,7 +2043,7 @@ with ( Data.Functional ) {
         return function () {
             var VERSION = '0.5.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -2108,10 +2108,10 @@ proto.constructor = List;
 
 // Iterator methods.
 // Return an iterator pointing to just before the n'th element
-// (the first element is the 0th one). If there are only n elements 
+// (the first element is the 0th one). If there are only n elements
 // in this list, return an iterator pointing to the tail.
-// If n is negative, it is treated as size+n, where size is the length 
-// of this list. Thus, if n is negative, the result of head(n) and 
+// If n is negative, it is treated as size+n, where size is the length
+// of this list. Thus, if n is negative, the result of head(n) and
 // the one of tail(-n) should be equivalent.
 // These methods can throw RangeError.
 proto.head = function ( n ) {
@@ -2211,7 +2211,7 @@ proto.get = function ( it ) {
     else               return it.value();
 };
 
-// Assigns the second argument to the container indexed by the first 
+// Assigns the second argument to the container indexed by the first
 // argument.
 // The argument can be either number or iterator.
 proto.set = function ( it, v ) {
@@ -2221,11 +2221,11 @@ proto.set = function ( it, v ) {
     return it.assign(v);
 };
 
-// Inserts a new container at the position indexed by the first 
-// argument, and sets the second argument to the container, then, 
+// Inserts a new container at the position indexed by the first
+// argument, and sets the second argument to the container, then,
 // returns the value of the container.
 // The argument can be either number or iterator.
-// The position which this iterator points to after insertion is 
+// The position which this iterator points to after insertion is
 // implementation-dependent.
 proto.insertAt = function ( it, v ) {
     if ( !(it instanceof List.Iterator  &&  it.isBoundTo(this)) ) {
@@ -2234,10 +2234,10 @@ proto.insertAt = function ( it, v ) {
     return it.insert(v);
 };
 
-// Removes the container indexed by the argument, then, returns the 
+// Removes the container indexed by the argument, then, returns the
 // value of the container.
 // The argument can be either number or iterator.
-// The position which this iterator points to after removal is 
+// The position which this iterator points to after removal is
 // implementation-dependent.
 proto.removeAt = function ( it ) {
     if ( !(it instanceof List.Iterator  &&  it.isBoundTo(this)) ) {
@@ -2413,7 +2413,7 @@ with ( Data.Functional ) {
         return function () {
             var VERSION = '0.4.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -2571,7 +2571,7 @@ with ( Data.Functional.List ) {
         return function () {
             var VERSION = '0.5.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -2639,10 +2639,10 @@ proto.toString = function ( ) {
 };
 
 
-// Assign the argument to the element which is just after the position 
-// this iterator points to, then returns the new value of the element, 
+// Assign the argument to the element which is just after the position
+// this iterator points to, then returns the new value of the element,
 // which can be defferent from the argument.
-// The effect of assignment at the tail of a list should be identical 
+// The effect of assignment at the tail of a list should be identical
 // to the one of insertion.
 // The default implementation merely throws UnimplementedMethodError.
 proto.assign = function ( v ) {
@@ -2650,10 +2650,10 @@ proto.assign = function ( v ) {
 };
 
 
-// Inserts a new container at the position which this iterator points 
-// to and sets the argument to the container, then, returns the value 
+// Inserts a new container at the position which this iterator points
+// to and sets the argument to the container, then, returns the value
 // of the container, which can be defferent from the argument.
-// The position which the iterator points to after insertion is 
+// The position which the iterator points to after insertion is
 // implementation-dependent.
 // The default implementation merely throws UnimplementedMethodError.
 proto.insert = function ( v ) {
@@ -2661,9 +2661,9 @@ proto.insert = function ( v ) {
 };
 
 
-// Removes the container just after the position which this iterator 
+// Removes the container just after the position which this iterator
 // points, then, returns the value of the container.
-// The position which the iterator points to after removal is 
+// The position which the iterator points to after removal is
 // implementation-dependent.
 // The default implementation merely throws UnimplementedMethodError.
 proto.remove = function ( ) {
@@ -2682,10 +2682,10 @@ proto.equals = function ( that ) {
 // Returns the distance of this iterator and the argument,
 // or undefined if the iterators seem to point to defferent list.
 // A negative return value means the arguments succeeds this iterator
-// and its magnitude represents the distance of them. Thus, this can be 
+// and its magnitude represents the distance of them. Thus, this can be
 // used as comparison-function.
 // The default implementation is based on `next', `equals' and `isTail' method.
-proto.distance  = 
+proto.distance  =
 proto.compareTo = function ( that ) {
     if ( !(that instanceof Iterator) ) return undefined;
     for ( var i=0, l=this, r=that;  ;  i--, l=l.next() ) {
@@ -2723,7 +2723,7 @@ with ( Data.Functional.List ) {
         return function () {
             var VERSION = '0.4.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -2768,7 +2768,7 @@ NAMESPACE = 'Data.Functional.List';
 
 
 
-// This module provides convinient wrapper to construct 
+// This module provides convinient wrapper to construct
 // reverse iterator from normal list iterator.
 
 
@@ -2852,7 +2852,7 @@ with ( function(){
         return function () {
             var VERSION = '0.5.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -2898,7 +2898,7 @@ with ( function(){
 
 
             return {
-                
+
             };
         }();
     }.call(null) ) {
@@ -2922,7 +2922,7 @@ with ( Data.Functional ) {
         return function () {
             var VERSION = '0.5.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -3278,7 +3278,7 @@ proto.previous = function ( ) {
     else                 return new this.constructor(this._arr, this._pos-1);
 };
 
-proto.compareTo = 
+proto.compareTo =
 proto.distance  = function ( that ) {
     if ( !(that instanceof this.constructor) ) return undefined;
     if ( this._arr !== that._arr             ) return undefined;
@@ -3334,7 +3334,7 @@ proto.remove = function ( ) {
 
 
             return {
-                
+
             };
         }();
     }
@@ -3371,7 +3371,7 @@ with ( Data.Cons ) {
         return function () {
             var VERSION = '0.2.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -3464,7 +3464,7 @@ function list ( /* variable args */ ) {
 proto = Cell.prototype;
 
 
-proto.iterator = 
+proto.iterator =
 proto.head     = function ( n ) {
     n = ToInteger(n);
     if ( n < 0 ) return this.tail(-n);
@@ -3889,7 +3889,7 @@ with ( Data ) {
         return function () {
             var VERSION = '0.3.1';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -4382,7 +4382,7 @@ with ( Concurrent ) {
         return function () {
             var VERSION = '0.1.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -4500,7 +4500,7 @@ function standBy ( t ) {
     var self = this;
     this._timerID = setTimeout(
         function(){ doNext.call(self); },
-        Number(t) || 2  // some version of IE occationally fails to 
+        Number(t) || 2  // some version of IE occationally fails to
                         // context-switch with timeout interval less than 2.
     );
 }
@@ -4727,7 +4727,7 @@ with ( Concurrent.Thread.Http ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -4941,7 +4941,7 @@ with ( Data.Cons.Util ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -5061,7 +5061,7 @@ with ( Concurrent.Thread.Compiler ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -6932,7 +6932,7 @@ with ( Concurrent.Thread.Compiler ) {
         return function () {
             var VERSION ;
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -7110,7 +7110,7 @@ with ( Concurrent.Thread.Compiler ) {
         return function () {
             var VERSION ;
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0
  *
@@ -7234,7 +7234,7 @@ with ( Concurrent.Thread ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -7399,7 +7399,7 @@ with ( Concurrent.Thread.Compiler.Kit ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0
  *
@@ -7495,7 +7495,7 @@ with ( Concurrent.Thread.Continuation ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -7636,7 +7636,7 @@ with ( Concurrent.Thread.Compiler ) {
         return function () {
             var VERSION = '0.0.0';
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0
  *
@@ -7878,7 +7878,7 @@ Token.TO_DOUBLE      = 146;
 Token.LAST_TOKEN     = 146;
 
 
-Token.name = function ( token ) 
+Token.name = function ( token )
 {
     if ( !Kit.printTrees ) return String(token);
     with ( Token ) {
@@ -8128,7 +8128,7 @@ with ( Concurrent.Thread.Compiler ) {
         return function () {
             var VERSION ;
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -9415,7 +9415,7 @@ with ( Concurrent.Thread.Compiler ) {
         return function () {
             var VERSION ;
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
@@ -9467,7 +9467,7 @@ NAMESPACE = 'Concurrent.Thread.Compiler';
 function Statement ( labels, lineno, source ) {
     // This is kind of abstract class.
     this.labels = labels;  // array of Identifier  # labels directly qualifying this statement
-    this.lineno = lineno;  // Number (optional)    # line no. 
+    this.lineno = lineno;  // Number (optional)    # line no.
     this.source = source;  // String (optional)    # file-name, URL, ...etc
 }
 
@@ -10117,7 +10117,7 @@ with ( Concurrent.Thread.Compiler ) {
         return function () {
             var VERSION ;
             var NAMESPACE;
-            
+
 /* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *

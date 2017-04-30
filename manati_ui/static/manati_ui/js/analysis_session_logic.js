@@ -109,7 +109,8 @@ function AnalysisSessionLogic(){
         var columns = [];
         for(var i = 0; i< headers.length ; i++){
             var v = headers[i];
-            columns.add({title: v, name: v, class: v});
+            //columns.add({title: v, name: v, class: v});
+            columns.push({title: v, name: v, class: v});
         }
         //verifying if already exist a table, in that case, destroy it
         if(_dt != null || _dt != undefined) {
@@ -204,14 +205,15 @@ function AnalysisSessionLogic(){
         } );
         hideLoading();
         $('#panel-datatable').show();
+
          _dt.on( 'column-reorder', function ( e, settings, details ) {
             thiz.setColumnsOrderFlat(true);
          });
          _dt.on( 'buttons-action', function ( e, buttonApi, dataTable, node, config ) {
             thiz.setColumnsOrderFlat(true);
         } );
-         _dt.columns(0).visible(true); // hack fixing one bug with the header of the table
 
+        // _dt.columns(0).visible(true); // hack fixing one bug with the header of the table
          $("#weblogs-datatable").on("click", "a.virus-total-consult",function (ev) {
              ev.preventDefault();
              var elem = $(this);
@@ -254,7 +256,7 @@ function AnalysisSessionLogic(){
              }
 
          });
-
+          $("#weblogs-datatable").DataTable().draw();// better hack fixing one bug with the header of the table
     }
     function initData(data, headers) {
 
@@ -266,9 +268,12 @@ function AnalysisSessionLogic(){
         var data_processed = _.map(_data_uploaded,function(v, i){
                                 var values = _.values(v);
                                 if(values.length < _data_headers.length){
-                                    values.add('undefined');
-                                    values.add(-1);
-                                    values.add(_countID.toString());
+                                    //values.add('undefined');
+                                    //values.add(-1);
+                                    //values.add(_countID.toString());
+                                    values.push('undefined');
+                                    values.push(-1);
+                                    values.push(_countID.toString());
                                     _data_uploaded[i][COL_VERDICT_STR] = "undefined";
                                     _data_uploaded[i][COL_REG_STATUS_STR] = (-1).toString();
                                     _data_uploaded[i][COL_DT_ID_STR] =_countID.toString();
@@ -416,7 +421,7 @@ function AnalysisSessionLogic(){
         var headers = $.map(_dt.columns().header(),function (v,i) {
             return {order: i, column_name: v.innerHTML, visible: column_visibles[i] };
         });
-        
+
         return headers;
     }
     function saveDB(headers,rows){
@@ -448,30 +453,31 @@ function AnalysisSessionLogic(){
                     // console.log("success"); // another sanity check
                     _analysis_session_id = json['data']['analysis_session_id'];
                     setFileName(json['data']['filename']);
+
+                    _m.EventAnalysisSessionSavingFinished(_filename,_analysis_session_id);
+                    $.notify("All Weblogs ("+json['data_length']+ ") were created successfully ", 'success');
                     if(_analysis_session_type_file != "argus_netflow") {
                         _dt.column(COLUMN_REG_STATUS, {search: 'applied'}).nodes().each(function (cell, i) {
                             var tr = $(cell).closest('tr');
                             if (!tr.hasClass("modified")) cell.innerHTML = 0;
                         });
+                        $('#save-table').hide();
+                        $('#public-btn').show();
+                        $('#wrap-form-upload-file').hide();
+                        history.pushState({},
+                            "Edit AnalysisSession " + _analysis_session_id,
+                            "/manati_project/manati_ui/analysis_session/" + _analysis_session_id + "/edit");
+                        _sync_db_interval = setInterval(syncDB, TIME_SYNC_DB);
+                        hideLoading();
+                        columns_order_changed = false;
+                        $("#weblogfile-name").off('click');
+                        $("#weblogfile-name").css('cursor', 'auto');
+                        $("#sync-db-btn").show();
+                        //show comment and update form
+                        $("#coments-as-nav").show();
+                        $('#comment-form').attr('action', '/manati_project/manati_ui/analysis_session/' +
+                            _analysis_session_id + '/comment/create')
                     }
-                    _m.EventAnalysisSessionSavingFinished(_filename,_analysis_session_id);
-                    $.notify("All Weblogs ("+json['data_length']+ ") were created successfully ", 'success');
-                    $('#save-table').hide();
-                    $('#public-btn').show();
-                    $('#wrap-form-upload-file').hide();
-                    history.pushState({},
-                        "Edit AnalysisSession "  + _analysis_session_id,
-                        "/manati_project/manati_ui/analysis_session/"+_analysis_session_id+"/edit");
-                    _sync_db_interval = setInterval(syncDB, TIME_SYNC_DB );
-                    hideLoading();
-                    columns_order_changed = false;
-                    $("#weblogfile-name").off('click');
-                    $("#weblogfile-name").css('cursor','auto');
-                    $("#sync-db-btn").show();
-                    //show comment and update form
-                    $("#coments-as-nav").show();
-                    $('#comment-form').attr('action', '/manati_project/manati_ui/analysis_session/'+
-                        _analysis_session_id+'/comment/create')
                 },
 
                 // handle a non-successful response
@@ -1142,7 +1148,13 @@ function AnalysisSessionLogic(){
         google.charts.load('current', {'packages':['geochart']});
 
         google.charts.setOnLoadCallback(regioMap);
-
+        function regioMap() {
+        $(window).on('drawmap', function (e) {
+            console.log('drawmap'/*, e.state*/);
+            drawRegioMap()
+            //Concurrent.Thread.create(drawRegioMap);
+        });
+        }
 
         on_ready_fn();
 
@@ -1168,17 +1180,11 @@ function AnalysisSessionLogic(){
         _m.EventFileUploadingFinished(_filename);
         console.log(json);
         visualizeJSONtoHTML(json);
-
         var evt = $.Event('drawmap');
         //evt.state = state;
         $(window).trigger(evt);
     };
-    function regioMap() {
-        $(window).on('drawmap', function (e) {
-            console.log('drawmap'/*, e.state*/);
-            drawRegioMap()
-        });
-    }
+
     function drawRegioMap() {
 
         var data = google.visualization.arrayToDataTable([
@@ -1291,7 +1297,7 @@ function AnalysisSessionLogic(){
 
             $(document).ready(function(){
                 $('#panel-datatable').show();
-                setInterval(syncDB, TIME_SYNC_DB ); 
+                setInterval(syncDB, TIME_SYNC_DB );
 
             });
         }else{
