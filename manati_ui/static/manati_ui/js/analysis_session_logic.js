@@ -37,6 +37,10 @@ var _flows_grouped;
 var _helper;
 var _filterDataTable;
 
+var _selectedIP;
+var _jsonprofie;
+
+
 var _m;
 
 
@@ -1150,11 +1154,13 @@ function AnalysisSessionLogic(){
         google.charts.setOnLoadCallback(regioMap);
         function regioMap() {
         $(window).on('drawmap', function (e) {
-            console.log('drawmap'/*, e.state*/);
+            console.log('drawmap'/*, e.countriesDict*/);
             drawRegioMap()
             //Concurrent.Thread.create(drawRegioMap);
         });
         }
+
+
 
         on_ready_fn();
 
@@ -1174,34 +1180,82 @@ function AnalysisSessionLogic(){
         //$.notify(file.type,"info")
 
     };
+    thiz.redrawVisualization = function(){
+        drawRegioMap()
+    }
     thiz.showJson = function(json){
+        _jsonprofie = json;
+        $.each(_jsonprofie, function(k, v) {
+            //display the key and value pair
+            //alert(k + ' is ' + v);
+            var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
+            $(".btn-group").append($something);
+        });
+
         $("#jsontext").show();
+        $("#viztext").show();
+
+        $(".btn-group").show();
+
         hideLoading();
         _m.EventFileUploadingFinished(_filename);
         console.log(json);
         visualizeJSONtoHTML(json);
         var evt = $.Event('drawmap');
-        //evt.state = state;
+        //var countriesDict = json['147.32.80.9']['hours']['2016/10/05 00']['clientDictOfDistinctCountries'];
+        //evt.countriesDict = countriesDict;
+        var num = null;
+            $(".btn-group .btn").on("click", function(){
+            _selectedIP = $(this).val();
+            drawRegioMap()
+            //alert("Value is " + n);
+        });
         $(window).trigger(evt);
+        $(window).smartresize(function(){
+            drawRegioMap();
+        });
     };
 
     function drawRegioMap() {
-
-        var data = google.visualization.arrayToDataTable([
-          ['Country', 'Popularity'],
-          ['Germany', 200],
-          ['United States', 300],
-          ['Brazil', 400],
-          ['Canada', 500],
-          ['France', 600],
-          ['RU', 700]
-        ]);
+        countriesDict = _jsonprofie[_selectedIP]['hours']['date:2016/10/05 hour:00']['clientDictOfDistinctCountries'];
+        var count = [
+          ['Country', 'Number of flows logartihm scale'],
+        ];
+        for (var country in countriesDict) {
+             count.push([country, Math.log(countriesDict[country])/Math.log(10)]);
+        }
+        //count.push(['Czech Republic', 12]);
+        var data = google.visualization.arrayToDataTable(count);
 
         var options = {};
 
-        var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+       var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
 
         chart.draw(data, options);
+
+ /*       var chart = new google.visualization.ChartWrapper({
+        chartType: 'GeoChart',
+        containerId: 'regions_div',
+        dataTable: data,
+        options: {
+           // width: 600,
+            legend: 'none' // hide the legend since the values will not be accurate
+        },
+        view: {
+            columns: [0, {
+                // log scale the data
+                type: 'number',
+                label: 'Value',
+                calc: function (dt, row) {
+                    // find the base-10 log of the value
+                    var log = Math.log(dt.getValue(row, 1)) / Math.log(10);
+                    return {v: log, f: dt.getFormattedValue(row, 1)};
+                }
+            }]
+        }
+    });
+    chart.draw();
+    */
     };
     thiz.parseData = function(file_rows){
         $("#jsontext").hide();

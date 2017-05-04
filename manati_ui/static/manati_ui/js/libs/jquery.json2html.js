@@ -37,7 +37,7 @@
 			
 			//let json2html core do it's magic
 			var result = json2html.transform(json, transform, options);
-			
+			console.log(result);
 			//Attach the html(string) result to the DOM
 			var dom = $(document.createElement('i')).html(result.html);
 
