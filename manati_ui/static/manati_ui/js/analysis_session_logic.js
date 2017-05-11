@@ -38,6 +38,7 @@ var _helper;
 var _filterDataTable;
 
 var _selectedIP;
+var _selectedHour;
 var _jsonprofie;
 
 
@@ -1149,13 +1150,13 @@ function AnalysisSessionLogic(){
     //INITIAL function , like a contructor
     thiz.init = function(){
         reader_files = ReaderFile(thiz);
-        google.charts.load('current', {'packages':['geochart']});
+        google.charts.load('current', {'packages':['geochart','corechart','table','bar']});
 
-        google.charts.setOnLoadCallback(regioMap);
+        google.charts.setOnLoadCallback(redrawVisualization());
         function regioMap() {
         $(window).on('drawmap', function (e) {
-            console.log('drawmap'/*, e.countriesDict*/);
-            drawRegioMap()
+            console.log('Google charts loaded'/*, e.countriesDict*/);
+            //drawRegioMap()
             //Concurrent.Thread.create(drawRegioMap);
         });
         }
@@ -1180,58 +1181,181 @@ function AnalysisSessionLogic(){
         //$.notify(file.type,"info")
 
     };
-    thiz.redrawVisualization = function(){
-        drawRegioMap()
-    }
+
+    function redrawVisualization(){
+        //if(_selectedIP) {
+        if( typeof _selectedIP !== 'undefined' ) {
+            drawRegioMap();
+            $('#histograms_div').empty();
+            drawHistogram('clientDestinationPortTotalBytesTCP');
+            drawHistogram('clientSourcePortNumberOfFlowsTCP');
+            drawHistogram('clientDestinationPortNumberOfFlowsTCP');
+            drawHistogram('clientDestinationPortTotalBytesUDP');
+            drawHistogram('clientSourcePortNumberOfFlowsUDP');
+            drawHistogram('clientDestinationPortNumberOfFlowsUDP');
+
+
+        }
+    };
     thiz.showJson = function(json){
         _jsonprofie = json;
         $.each(_jsonprofie, function(k, v) {
             //display the key and value pair
             //alert(k + ' is ' + v);
             var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
-            $(".btn-group").append($something);
+            $(".btn-groupIPS").append($something);
         });
+        $(".btn-groupIPS").show();
+        $(".btn-groupHours").show();
 
         $("#jsontext").show();
         $("#viztext").show();
-
-        $(".btn-group").show();
+        $("#regionstext").show();
 
         hideLoading();
         _m.EventFileUploadingFinished(_filename);
         console.log(json);
         visualizeJSONtoHTML(json);
-        var evt = $.Event('drawmap');
+        //var evt = $.Event('drawmap');
         //var countriesDict = json['147.32.80.9']['hours']['2016/10/05 00']['clientDictOfDistinctCountries'];
         //evt.countriesDict = countriesDict;
         var num = null;
-            $(".btn-group .btn").on("click", function(){
+
+        function generateHourLayerOfButtons() {
+            $( ".btn-groupHours" ).empty();
+            $.each(_jsonprofie[_selectedIP]['hours'], function(k, v) {
+                var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
+                $(".btn-groupHours").append($something);
+            });
+            $(".btn-groupHours .btn").on("click", function() {
+                _selectedHour = $(this).val();
+                $(this).addClass('btn-lg btn-success').siblings().removeClass('btn-lg btn-success');;
+                redrawVisualization();
+            });
+
+        }
+
+        $(".btn-groupIPS .btn").on("click", function(){
             _selectedIP = $(this).val();
-            drawRegioMap()
+                //$(this).removeClass('btn btn-default');
+                $(this).addClass('btn-lg btn-primary').siblings().removeClass('btn-lg btn-primary');;
+            generateHourLayerOfButtons();
+            //redrawVisualization();
+            //drawRegioMap()
             //alert("Value is " + n);
         });
-        $(window).trigger(evt);
+       // $(window).trigger(evt);
         $(window).smartresize(function(){
-            drawRegioMap();
+            redrawVisualization();
         });
     };
+    function drawHistogram(nameofdict) {
+        //  <div id="chart_div"></div>
+        //console.log("aaaaaaaaaaa");
+        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][nameofdict];
+        if($('#histograms_div' + ' .' + nameofdict).length == 0)
+        {
+            var $histdiv= $('<div/>').attr({class: nameofdict,type: 'div'});
+            $('#histograms_div').append($histdiv);
 
-    function drawRegioMap() {
-        countriesDict = _jsonprofie[_selectedIP]['hours']['date:2016/10/05 hour:00']['clientDictOfDistinctCountries'];
-        var count = [
-          ['Country', 'Number of flows logartihm scale'],
-        ];
-        for (var country in countriesDict) {
-             count.push([country, Math.log(countriesDict[country])/Math.log(10)]);
         }
-        //count.push(['Czech Republic', 12]);
-        var data = google.visualization.arrayToDataTable(count);
+        var num = [
+          ['Port', 'Count'],
+          /*['22', 20],
+          ['80', 35],*/
+         /* ['Allosaurus (other lizard)', 12.2],
+          ['Apatosaurus (deceptive lizard)', 22.9],
+          ['Archaeopteryx (ancient wing)', 0.9],
+          ['Argentinosaurus (Argentina lizard)', 36.6]*/
+        ];
 
-        var options = {};
+            /*var num = ([
+                ['Port', 'Count']
+                ['22', 200],
+                ['80', 2000],
+            ]);*/
+            // num.push([0,0]);
 
-       var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+            /*for (var port in dict) {
+                num.push([port.toString(),dict[port]]);
+            }*/
+            var binsdict = {};
+            for(var port in dict)
+            {
+                var intport = Number(port);
+                var binid = Math.floor(intport/1024);
+                var stringid = (binid*1024).toString() +" - "+ ((binid*1024) + 1024).toString();
+                if(binid in binsdict) {
+                    binsdict[stringid] += dict[port];
+                }
+                else
+                {
+                    binsdict[stringid] = dict[port];
+                }
+            }
+            for(var bin in binsdict)
+            {
+                num.push([bin,binsdict[bin]]);
+            }
 
-        chart.draw(data, options);
+            var data = google.visualization.arrayToDataTable(num);
+            var options = {
+                title: nameofdict,
+                legend: {position: 'none'},
+                //orientation: 'vertical',
+                //hAxis: { title: 'ports' },
+                //chartArea:{left:20,top:0,width:'85%',height:'100%'},
+                legend: { position: 'top', maxLines: 2 },
+                minValue: 0,
+                maxValue: 65536,
+            };
+
+
+            //console.log($('#histograms_div' + ' .' + nameofdict).length);
+            var parent = document.getElementById("histograms_div");
+            var child = parent.getElementsByClassName(nameofdict)[0];
+        if (Object.keys(dict).length > 10) {
+            //var chart = new google.visualization.Histogram(child);
+            var chart = new google.visualization.ColumnChart(child);
+            chart.draw(data, options);
+
+        }
+        else if(Object.keys(dict).length < 1){
+            $('#histograms_div' + ' .' + nameofdict).append("<p>" + nameofdict +": No data availble</p>");
+        }
+        else {
+            $("<h4>" + nameofdict + ":</h4>").insertBefore('#histograms_div' + ' .' + nameofdict);
+            var chart = new google.visualization.Table(child);
+            chart.draw(data, options);
+
+        }
+
+    }
+    function drawRegioMap() {
+
+        countriesDict = _jsonprofie[_selectedIP]['hours'][_selectedHour]['clientDictOfDistinctCountries'];
+        console.log(countriesDict);
+        if(Object.keys(countriesDict).length > 0) {
+            var count = [
+                ['Country', 'Number of flows logartihm scale']
+            ];
+            for (var country in countriesDict) {
+                count.push([country, Math.log(countriesDict[country]) / Math.log(10)]);
+            }
+            //count.push(['Czech Republic', 12]);
+            var data = google.visualization.arrayToDataTable(count);
+
+            var options = {
+                title: 'Lengths of dinosaurs, in meters',
+            };
+
+            var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+
+            chart.draw(data, options);
+        }
+        else {
+            $("#regions_div").empty();
+        }
 
  /*       var chart = new google.visualization.ChartWrapper({
         chartType: 'GeoChart',
