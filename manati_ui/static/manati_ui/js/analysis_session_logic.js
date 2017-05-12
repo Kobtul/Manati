@@ -1197,6 +1197,10 @@ function AnalysisSessionLogic(){
 
         }
     };
+    function showCurrentJson()
+    {
+        visualizeJSONtoHTML(_jsonprofie[_selectedIP]['hours'][_selectedHour]);
+    }
     thiz.showJson = function(json){
         _jsonprofie = json;
         $.each(_jsonprofie, function(k, v) {
@@ -1215,7 +1219,7 @@ function AnalysisSessionLogic(){
         hideLoading();
         _m.EventFileUploadingFinished(_filename);
         console.log(json);
-        visualizeJSONtoHTML(json);
+
         //var evt = $.Event('drawmap');
         //var countriesDict = json['147.32.80.9']['hours']['2016/10/05 00']['clientDictOfDistinctCountries'];
         //evt.countriesDict = countriesDict;
@@ -1231,6 +1235,7 @@ function AnalysisSessionLogic(){
                 _selectedHour = $(this).val();
                 $(this).addClass('btn-lg btn-success').siblings().removeClass('btn-lg btn-success');;
                 redrawVisualization();
+                showCurrentJson();
             });
 
         }
@@ -1261,31 +1266,17 @@ function AnalysisSessionLogic(){
         }
         var num = [
           ['Port', 'Count'],
-          /*['22', 20],
-          ['80', 35],*/
-         /* ['Allosaurus (other lizard)', 12.2],
-          ['Apatosaurus (deceptive lizard)', 22.9],
-          ['Archaeopteryx (ancient wing)', 0.9],
-          ['Argentinosaurus (Argentina lizard)', 36.6]*/
         ];
-
-            /*var num = ([
-                ['Port', 'Count']
-                ['22', 200],
-                ['80', 2000],
-            ]);*/
-            // num.push([0,0]);
-
-            /*for (var port in dict) {
-                num.push([port.toString(),dict[port]]);
-            }*/
+        var small = [
+          ['Port', 'Count'],
+        ];
             var binsdict = {};
             for(var port in dict)
             {
                 var intport = Number(port);
                 var binid = Math.floor(intport/1024);
                 var stringid = (binid*1024).toString() +" - "+ ((binid*1024) + 1024).toString();
-                if(binid in binsdict) {
+                if(stringid in binsdict) {
                     binsdict[stringid] += dict[port];
                 }
                 else
@@ -1297,8 +1288,12 @@ function AnalysisSessionLogic(){
             {
                 num.push([bin,binsdict[bin]]);
             }
-
+            for(var port in dict)
+            {
+                small.push([port,dict[port]]);
+            }
             var data = google.visualization.arrayToDataTable(num);
+            var datasmall = google.visualization.arrayToDataTable(small);
             var options = {
                 title: nameofdict,
                 legend: {position: 'none'},
@@ -1317,6 +1312,7 @@ function AnalysisSessionLogic(){
         if (Object.keys(dict).length > 10) {
             //var chart = new google.visualization.Histogram(child);
             var chart = new google.visualization.ColumnChart(child);
+           // var chart = new google.charts.bar(child);
             chart.draw(data, options);
 
         }
@@ -1326,10 +1322,14 @@ function AnalysisSessionLogic(){
         else {
             $("<h4>" + nameofdict + ":</h4>").insertBefore('#histograms_div' + ' .' + nameofdict);
             var chart = new google.visualization.Table(child);
-            chart.draw(data, options);
+            chart.draw(datasmall, options);
 
         }
 
+    }
+    function drawNumberOfFlowsComparison()
+    {
+        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][nameofdict];
     }
     function drawRegioMap() {
 
