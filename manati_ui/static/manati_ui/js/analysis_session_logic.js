@@ -1182,17 +1182,26 @@ function AnalysisSessionLogic(){
 
     };
 
+
+
     function redrawVisualization(){
         //if(_selectedIP) {
         if( typeof _selectedIP !== 'undefined' ) {
             drawRegioMap();
             $('#histograms_div').empty();
-            drawHistogram('clientDestinationPortTotalBytesTCP');
             drawHistogram('clientSourcePortNumberOfFlowsTCP');
+            drawHistogram('clientSourcePortNumberOfFlowsUDP');
+
+            drawHistogram('clientDestinationPortTotalBytesTCP');
             drawHistogram('clientDestinationPortNumberOfFlowsTCP');
             drawHistogram('clientDestinationPortTotalBytesUDP');
-            drawHistogram('clientSourcePortNumberOfFlowsUDP');
             drawHistogram('clientDestinationPortNumberOfFlowsUDP');
+
+            drawHistogram('clientDestinationPortTotalPacketsUDP');
+            drawHistogram('clientDestinationPortTotalPacketsTCP');
+
+            drawTable('clientDestinationPortDictIPsTCP');
+            drawTable('clientDestinationPortDictIPsUDP');
 
 
         }
@@ -1235,11 +1244,17 @@ function AnalysisSessionLogic(){
                 _selectedHour = $(this).val();
                 $(this).addClass('btn-lg btn-success').siblings().removeClass('btn-lg btn-success');;
                 redrawVisualization();
-                showCurrentJson();
+                $('#jsonviz').empty();
+                $("#show-raw-json").show();
+                //showCurrentJson();
             });
 
         }
-
+        $("#show-raw-json").on("click",function () {
+            if( typeof _selectedIP !== 'undefined' ) {
+                showCurrentJson();
+            }
+        });
         $(".btn-groupIPS .btn").on("click", function(){
             _selectedIP = $(this).val();
                 //$(this).removeClass('btn btn-default');
@@ -1254,6 +1269,35 @@ function AnalysisSessionLogic(){
             redrawVisualization();
         });
     };
+    function drawTable(name) {
+        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][name];
+        if($('#table_div' + ' .' + name).length == 0)
+        {
+            var $tcp= $('<div/>').attr({class: name,type: 'div'});
+            $('#table_div').append($tcp);
+        }
+        var small = [
+          ['Port', 'IPs'],
+        ];
+
+        for(var port in dict)
+        {
+            small.push([port,Object.keys(dict[port]).toString()]);
+        }
+
+        var data = google.visualization.arrayToDataTable(small);
+
+        var options = {}
+        var parent = document.getElementById("table_div");
+        var child = parent.getElementsByClassName(name)[0];
+
+        var table = new google.visualization.Table(child);
+        $("<h4>" + (name) + ":</h4>").insertBefore('#table_div' + ' .' + name);
+        table.draw(data, options);
+
+    }
+
+
     function drawHistogram(nameofdict) {
         //  <div id="chart_div"></div>
         //console.log("aaaaaaaaaaa");

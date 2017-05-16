@@ -157,3 +157,7 @@ INFO 2017-05-12 11:33:59,080 driver 4569 140538761180928 Generating grammar tabl
 INFO 2017-05-12 11:33:59,127 driver 4569 140538761180928 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
 INFO 2017-05-12 11:33:59,819 driver 4591 140443939698432 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
 INFO 2017-05-12 11:33:59,874 driver 4591 140443939698432 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-05-16 10:27:23,928 driver 13883 140078928058112 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-05-16 10:27:24,060 driver 13883 140078928058112 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-05-16 10:27:25,314 driver 13886 140014931220224 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-05-16 10:27:25,430 driver 13886 140014931220224 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt

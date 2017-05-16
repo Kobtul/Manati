@@ -45,6 +45,7 @@
                     {% if user.is_authenticated %}
                         <input type="button" id="save-table" class="btn btn-primary" value="Save!" />
                     {% endif %}
+                    <input type="button" id="show-raw-json" class="btn btn-primary" value="Show JSON" />
 
 
 
@@ -73,7 +74,12 @@
         <div id="histograms_div">
             <div class="chart_div"></div>
         </div>
-
+        <div id="table_div">
+            <!--<h4> clientDestinationPortDictIPsTCP:</h4>
+            <div class="test_divTCP"></div>
+            <h4> clientDestinationPortDictIPsUDP:</h4>
+            <div class="test_divUDP"></div>-->
+        </div>
         <div id="jsontext" style="display: none;">
             <h2>JSON</h2>
         </div>
