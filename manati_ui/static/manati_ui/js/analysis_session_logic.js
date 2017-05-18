@@ -1275,6 +1275,7 @@ function AnalysisSessionLogic(){
         {
             var $tcp= $('<div/>').attr({class: name,type: 'div'});
             $('#table_div').append($tcp);
+            $("<h4>" + (name) + ":</h4>").insertBefore('#table_div' + ' .' + name);
         }
         var small = [
           ['Port', 'IPs'],
@@ -1292,7 +1293,6 @@ function AnalysisSessionLogic(){
         var child = parent.getElementsByClassName(name)[0];
 
         var table = new google.visualization.Table(child);
-        $("<h4>" + (name) + ":</h4>").insertBefore('#table_div' + ' .' + name);
         table.draw(data, options);
 
     }
@@ -1315,6 +1315,14 @@ function AnalysisSessionLogic(){
           ['Port', 'Count'],
         ];
             var binsdict = {};
+            for(var bin=0;bin<65536/1024;bin++)
+            {
+                var stringid = (bin*1024).toString() +" - "+ ((bin*1024) + 1024).toString();
+                binsdict[stringid] = 0;
+            }
+            var arr = Object.keys( dict ).map(function ( key ) { return dict[key]; });
+            var max = Math.max.apply( null, arr );
+
             for(var port in dict)
             {
                 var intport = Number(port);
@@ -1328,23 +1336,40 @@ function AnalysisSessionLogic(){
                     binsdict[stringid] = dict[port];
                 }
             }
+            var arr = Object.keys( binsdict ).map(function ( key ) { return binsdict[key]; });
+            var maxim = Math.max.apply( null, arr );
             for(var bin in binsdict)
             {
-                num.push([bin,binsdict[bin]]);
+                num.push([bin,binsdict[bin]/maxim]);
             }
             for(var port in dict)
             {
                 small.push([port,dict[port]]);
             }
-            var data = google.visualization.arrayToDataTable(num);
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string','port');
+            dataTable.addColumn('number','count');
+            dataTable.addColumn({type: 'string', role: 'tooltip'});
+
+            for(var bin in binsdict)
+            {
+                dataTable.addRow([bin,binsdict[bin]/maxim,"Bin: " + bin + "\nReal number: " + binsdict[bin]]);
+            }
+
+            //var data = google.visualization.arrayToDataTable(num);
+
             var datasmall = google.visualization.arrayToDataTable(small);
             var options = {
-                title: nameofdict,
-                legend: {position: 'none'},
+                title: nameofdict + "    normalised with value: " + maxim.toString(),
+               // legend: {position: 'none'},
                 //orientation: 'vertical',
                 //hAxis: { title: 'ports' },
                 //chartArea:{left:20,top:0,width:'85%',height:'100%'},
-                legend: { position: 'top', maxLines: 2 },
+               // legend: { position: 'top', maxLines: 2 },
+                legend: 'none',
+               // tooltip: {textStyle: {color: '#03f8ff'}, showColorCode: true},
+
+                vAxis: {format: 'decimal'},
                 minValue: 0,
                 maxValue: 65536,
             };
@@ -1353,11 +1378,54 @@ function AnalysisSessionLogic(){
             //console.log($('#histograms_div' + ' .' + nameofdict).length);
             var parent = document.getElementById("histograms_div");
             var child = parent.getElementsByClassName(nameofdict)[0];
-        if (Object.keys(dict).length > 10) {
+        if (Object.keys(dict).length >= 1) {
             //var chart = new google.visualization.Histogram(child);
+
+            //var chart = new google.charts.Bar(child);
+            //chart.draw(dataTable, google.charts.Bar.convertOptions(options));
+
             var chart = new google.visualization.ColumnChart(child);
-           // var chart = new google.charts.bar(child);
-            chart.draw(data, options);
+            chart.draw(dataTable, options);
+            var current = 0;
+            google.visualization.events.addListener(chart, 'select', function() {
+                current = 1- current;
+                if (current == 1) {
+                   // alert(current);
+                    dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][nameofdict];
+                    var abc = chart.getSelection();
+
+                    var rowid = abc[0].row;
+                    var dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string','port');
+                    dataTable.addColumn('number','count');
+                    dataTable.addColumn({type: 'string', role: 'tooltip'});
+                    var maxim = 0;
+                    for (port = rowid * 1024; port < (rowid * 1024) + 1024; port++) {
+                        if(maxim < dict[port]) maxim = dict[port];
+                    }
+
+                    for (port = rowid * 1024; port < (rowid * 1024) + 1024; port++) {
+                        if (port in dict) {
+                            dataTable.addRow([port.toString(), dict[port]/maxim,"Port: " + port.toString() + "\nReal number: " + dict[port]]);
+                        }
+                        /*  else {
+                         num.push([port,0]);
+                         }*/
+                    }
+                    var options = {
+                        title: nameofdict + " Normalised with value: " + maxim,
+                       // legend: {position: 'top', maxLines: 2},
+                        legend: 'none',
+                        vAxis: {format: 'decimal'},
+                        minValue: 0,
+                        maxValue: 65536,
+                    };
+                    chart.draw(dataTable, google.charts.Bar.convertOptions(options));
+                }
+                else {
+                    drawHistogram(nameofdict);
+                }
+            });
 
         }
         else if(Object.keys(dict).length < 1){
