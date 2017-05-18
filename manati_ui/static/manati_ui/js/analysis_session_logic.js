@@ -1189,7 +1189,7 @@ function AnalysisSessionLogic(){
         if( typeof _selectedIP !== 'undefined' ) {
             drawRegioMap();
             $('#histograms_div').empty();
-            drawHistogram('clientSourcePortNumberOfFlowsTCP');
+            /*drawHistogram('clientSourcePortNumberOfFlowsTCP');
             drawHistogram('clientSourcePortNumberOfFlowsUDP');
 
             drawHistogram('clientSourcePortTotalBytesTCP');
@@ -1206,14 +1206,33 @@ function AnalysisSessionLogic(){
             drawHistogram('clientDestinationPortTotalBytesUDP');
 
             drawHistogram('clientDestinationPortTotalPacketsTCP');
-            drawHistogram('clientDestinationPortTotalPacketsUDP');
-
+            drawHistogram('clientDestinationPortTotalPacketsUDP');*/
+            drawPortFeatures();
             drawTable('clientDestinationPortDictIPsTCP');
             drawTable('clientDestinationPortDictIPsUDP');
 
 
         }
     };
+    function drawPortFeatures() {
+        var s = ['client', 'server'];
+        var d = ['SourcePort', 'DestinationPort'];
+        var f = ['TotalBytes', 'TotalPackets', 'NumberOfFlows'];
+        var p = ['TCP', 'UDP'];
+        var si,di,fi,pi;
+        var name;
+    for (si = 0; si < s.length; ++si) {
+        for (di = 0; di < d.length; ++di) {
+            for (fi = 0; fi < f.length; ++fi) {
+                for (pi = 0; pi < p.length; ++pi) {
+                   name = s[si] + d[di] + f[fi] + p[pi];
+                   drawHistogram(name);
+                }
+            }
+        }
+    }
+
+    }
     function showCurrentJson()
     {
         visualizeJSONtoHTML(_jsonprofie[_selectedIP]['hours'][_selectedHour]);
@@ -1453,7 +1472,7 @@ function AnalysisSessionLogic(){
     }
     function drawRegioMap() {
 
-        countriesDict = _jsonprofie[_selectedIP]['hours'][_selectedHour]['clientDictOfDistinctCountries'];
+        countriesDict = _jsonprofie[_selectedIP]['hours'][_selectedHour]['clientDictNumberOfDistinctCountries'];
         console.log(countriesDict);
         if(Object.keys(countriesDict).length > 0) {
             var dataTable = new google.visualization.DataTable();
