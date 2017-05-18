@@ -1192,13 +1192,21 @@ function AnalysisSessionLogic(){
             drawHistogram('clientSourcePortNumberOfFlowsTCP');
             drawHistogram('clientSourcePortNumberOfFlowsUDP');
 
-            drawHistogram('clientDestinationPortTotalBytesTCP');
+            drawHistogram('clientSourcePortTotalBytesTCP');
+            drawHistogram('clientSourcePortTotalBytesUDP');
+
+            drawHistogram('clientSourcePortTotalPacketsTCP');
+            drawHistogram('clientSourcePortTotalPacketsUDP');
+
             drawHistogram('clientDestinationPortNumberOfFlowsTCP');
-            drawHistogram('clientDestinationPortTotalBytesUDP');
             drawHistogram('clientDestinationPortNumberOfFlowsUDP');
 
-            drawHistogram('clientDestinationPortTotalPacketsUDP');
+
+            drawHistogram('clientDestinationPortTotalBytesTCP');
+            drawHistogram('clientDestinationPortTotalBytesUDP');
+
             drawHistogram('clientDestinationPortTotalPacketsTCP');
+            drawHistogram('clientDestinationPortTotalPacketsUDP');
 
             drawTable('clientDestinationPortDictIPsTCP');
             drawTable('clientDestinationPortDictIPsUDP');
@@ -1360,7 +1368,7 @@ function AnalysisSessionLogic(){
 
             var datasmall = google.visualization.arrayToDataTable(small);
             var options = {
-                title: nameofdict + "    normalised with value: " + maxim.toString(),
+                title: nameofdict + "\nNormalised with value: " + maxim.toString(),
                // legend: {position: 'none'},
                 //orientation: 'vertical',
                 //hAxis: { title: 'ports' },
@@ -1413,7 +1421,7 @@ function AnalysisSessionLogic(){
                          }*/
                     }
                     var options = {
-                        title: nameofdict + " Normalised with value: " + maxim,
+                        title: nameofdict + "\nNormalised with value: " + maxim,
                        // legend: {position: 'top', maxLines: 2},
                         legend: 'none',
                         vAxis: {format: 'decimal'},
@@ -1448,22 +1456,30 @@ function AnalysisSessionLogic(){
         countriesDict = _jsonprofie[_selectedIP]['hours'][_selectedHour]['clientDictOfDistinctCountries'];
         console.log(countriesDict);
         if(Object.keys(countriesDict).length > 0) {
-            var count = [
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string','Country');
+            dataTable.addColumn('number','Number of flows');
+            dataTable.addColumn({type: 'string', role: 'tooltip'});
+
+
+           /* var count = [
                 ['Country', 'Number of flows logartihm scale']
-            ];
+            ];*/
             for (var country in countriesDict) {
-                count.push([country, Math.log(countriesDict[country]) / Math.log(10)]);
+                //count.push([country, Math.log(countriesDict[country]) / Math.log(10)]);
+                dataTable.addRow([country, Math.log(countriesDict[country]) / Math.log(10),"Number of client flows to this country: " + countriesDict[country].toString()]);
             }
             //count.push(['Czech Republic', 12]);
-            var data = google.visualization.arrayToDataTable(count);
+            //var data = google.visualization.arrayToDataTable(count);
 
             var options = {
                 title: 'Lengths of dinosaurs, in meters',
+                legend: 'none',
             };
 
             var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
 
-            chart.draw(data, options);
+            chart.draw(dataTable, options);
         }
         else {
             $("#regions_div").empty();
