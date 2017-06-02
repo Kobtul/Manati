@@ -58,73 +58,44 @@
 
             </form>
         </div>
-
-        <div id="viztext" style="display: none;">
-            <h2>Visualization</h2>
-        </div>
-        <div class="btn-groupIPS" role="group" aria-label="..." style="display: none;">
-        </div>
-        <div class="btn-groupHours" role="group" aria-label="..." style="display: none;">
-        </div>
-
-        <div id="regionstext" style="display: none;">
-            <h3>Regions</h3>
-        </div>
-        <div id="regions_div"></div> <!--style="width: 900px; height: 500px;"></div>-->
-        <div id="histograms_div">
-            <div class="chart_div"></div>
-        </div>
-        <div id="table_div">
-            <!--<h4> clientDestinationPortDictIPsTCP:</h4>
-            <div class="test_divTCP"></div>
-            <h4> clientDestinationPortDictIPsUDP:</h4>
-            <div class="test_divUDP"></div>-->
-        </div>
-        <div id="jsontext" style="display: none;">
-            <h2>JSON</h2>
-        </div>
-        <div id='jsonviz'></div>
+    </div>
+    <div class="row">
+        <input type="button" id="backbutton"    class="backbutton btn">
+        <input type="button" id="forwardbutton" class="forwardbutton btn">
         <div class="col-md-12">
-            <div class="panel panel-default" id="panel-datatable">
-                <div class="panel-body">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a href="#home" data-toggle="tab">Home</a>
-                        </li>
-                        <li id="statical-nav" style="display: none;"><a href="#statical-section" data-toggle="tab">Statistics Section</a>
-                        </li>
-                        {% if user.is_authenticated %}
-                        <li id="coments-as-nav" style="display: none;"><a href="#comment-section" data-toggle="tab">Comments</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                    <!-- Tab panes -->
-                    <div class="tab-content">
-                        <div class="tab-pane fade in active" id="home">
-                            <br/>
-                            {% include 'manati_ui/analysis_session/table_options.html' %}
-                            <table class="table table-striped table-bordered table-hover weblogs-datatable"  cellspacing="0" width="100%" id="weblogs-datatable">
-                            </table>
-                        </div>
-                        <div class="tab-pane fade" id="statical-section"></div>
-                        {% if user.is_authenticated %}
-                        <div class="tab-pane fade" id="comment-section">
-                            <form  method="POST" id="comment-form" action='' class="form" method="post" role="form">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <textarea class="form-control" rows="10" maxlength="255" name="text">{{ comment.text   }}</textarea>
-                                </div>
-                            <input type="submit" class="btn btn-success" value="Update Comment" />
-                            </form>
-                        </div>
-                        {% endif %}
-                    </div>
-
-                </div>
-
+            <div id="viztext" style="display: none;">
+                <h2>Visualization</h2>
             </div>
+            <div class="btn-groupIPS" role="group" aria-label="..." style="display: none;">
+            </div>
+            <div id="ipsumarytext" style="display: none;">
+                <h3>IP Sumary</h3>
+            </div>
+            <div class="btn-groupHours" role="group" aria-label="..." style="display: none;">
+            </div>
+            <div id="hoursumarytext" style="display: none;">
+                <h3>Hour Sumary</h3>
+            </div>
+            <div id="regionstex" style="display: none;">
+                <h3>Regions</h3>
+            </div>
+            <div id="regions_div">
+            </div><!--style="width: 900px; height: 500px;"></div>-->
 
+            <div id="histograms_div">
+                <h3 id="histogramstext" style="display: none;">Histograms</h3>
+                <!--<div class="chart_div"></div>-->
+            </div>
+            <div id="table_div">
+                <h3 class="tablestext" style="display: none;">Tables</h3>
+            </div>
+            <div id="jsontext" style="display: none;">
+                <h2>JSON</h2>
+            </div>
+            <div id='jsonviz'></div>
         </div>
-
+            <div class="col-md-2 ">
+            </div>
     </div>
     {% include 'manati_ui/analysis_session/modal_vt.html' %}
     <style>

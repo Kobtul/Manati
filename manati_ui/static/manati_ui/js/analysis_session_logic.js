@@ -40,6 +40,8 @@ var _filterDataTable;
 var _selectedIP;
 var _selectedHour;
 var _jsonprofie;
+var _hoursarray;
+
 
 
 var _m;
@@ -1223,8 +1225,8 @@ function AnalysisSessionLogic(){
         var name;
     for (si = 0; si < s.length; ++si) {
         for (di = 0; di < d.length; ++di) {
-            for (fi = 0; fi < f.length; ++fi) {
-                for (pi = 0; pi < p.length; ++pi) {
+            for (pi = 0; pi < p.length; ++pi) {
+                for (fi = 0; fi < f.length; ++fi) {
                    name = s[si] + d[di] + f[fi] + p[pi];
                    drawHistogram(name);
                 }
@@ -1245,35 +1247,57 @@ function AnalysisSessionLogic(){
             var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
             $(".btn-groupIPS").append($something);
         });
+        $("#viztext").show();
         $(".btn-groupIPS").show();
         $(".btn-groupHours").show();
 
-        $("#jsontext").show();
-        $("#viztext").show();
-        $("#regionstext").show();
 
         hideLoading();
         _m.EventFileUploadingFinished(_filename);
-        console.log(json);
+        //console.log(json);
 
         //var evt = $.Event('drawmap');
         //var countriesDict = json['147.32.80.9']['hours']['2016/10/05 00']['clientDictOfDistinctCountries'];
         //evt.countriesDict = countriesDict;
         var num = null;
-
+        $("#backbutton").on("click", function() {
+            var prevbutton = $(".btn-groupHours .btn[value='"+_selectedHour+"']").prev();//.value( "Hot Fuzz" );
+            if( typeof prevbutton !== 'undefined' ) {
+                prevbutton.click();
+            }
+        });
+        $("#forwardbutton").on("click", function() {
+            var prevbutton = $(".btn-groupHours .btn[value='"+_selectedHour+"']").next();//.value( "Hot Fuzz" );
+            if( typeof prevbutton !== 'undefined' ) {
+                prevbutton.click();
+            }
+        });
         function generateHourLayerOfButtons() {
+            var hours = [];
             $( ".btn-groupHours" ).empty();
             $.each(_jsonprofie[_selectedIP]['hours'], function(k, v) {
-                var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
-                $(".btn-groupHours").append($something);
+                hours.push(k);
+                //var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
+                //$(".btn-groupHours").append($something);
             });
+            hours.sort();
+            for(var i =0;i<hours.length;i++)
+            {
+                var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:hours[i]});
+                $(".btn-groupHours").append($something);
+            }
             $(".btn-groupHours .btn").on("click", function() {
                 _selectedHour = $(this).val();
-                $(this).addClass('btn-lg btn-success').siblings().removeClass('btn-lg btn-success');;
+                $(this).addClass('btn-success').siblings().removeClass('btn-success');;
                 redrawVisualization();
                 $('#jsonviz').empty();
                 $("#show-raw-json").show();
                 //showCurrentJson();
+                $("#hoursumarytext").show();
+                $("#regionstext").show();
+                $("#histogramstext").show();
+                $("#table_div .tablestext").show();
+                $("#jsontext").show();
             });
 
         }
@@ -1285,7 +1309,8 @@ function AnalysisSessionLogic(){
         $(".btn-groupIPS .btn").on("click", function(){
             _selectedIP = $(this).val();
                 //$(this).removeClass('btn btn-default');
-                $(this).addClass('btn-lg btn-primary').siblings().removeClass('btn-lg btn-primary');;
+                $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+            $("#ipsumarytext").show();
             generateHourLayerOfButtons();
             //redrawVisualization();
             //drawRegioMap()
@@ -1296,6 +1321,7 @@ function AnalysisSessionLogic(){
             redrawVisualization();
         });
     };
+
     function drawTable(name) {
         dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][name];
         if($('#table_div' + ' .' + name).length == 0)
@@ -1408,8 +1434,8 @@ function AnalysisSessionLogic(){
         if (Object.keys(dict).length >= 1) {
             //var chart = new google.visualization.Histogram(child);
 
-            //var chart = new google.charts.Bar(child);
-            //chart.draw(dataTable, google.charts.Bar.convertOptions(options));
+           // var chart = new google.charts.Bar(child);
+           // chart.draw(dataTable, google.charts.Bar.convertOptions(options));
 
             var chart = new google.visualization.ColumnChart(child);
             chart.draw(dataTable, options);
@@ -1492,8 +1518,7 @@ function AnalysisSessionLogic(){
             //var data = google.visualization.arrayToDataTable(count);
 
             var options = {
-                title: 'Lengths of dinosaurs, in meters',
-                legend: 'none',
+                legend: 'none'
             };
 
             var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));

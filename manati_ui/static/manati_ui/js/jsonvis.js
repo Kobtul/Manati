@@ -21,7 +21,7 @@ var transforms = {
 		{'tag':'div','class':'children','children':function(obj){return(children(obj.value));}}
 	]}
 };
-visualize(json)
+visualize(json);
 
 function visualize(json) {
 
