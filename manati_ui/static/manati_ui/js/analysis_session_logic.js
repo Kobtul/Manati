@@ -1422,7 +1422,7 @@ function AnalysisSessionLogic(){
                 legend: 'none',
                // tooltip: {textStyle: {color: '#03f8ff'}, showColorCode: true},
 
-                vAxis: {format: 'decimal'},
+                vAxis: {format: 'decimal',scaleType:'mirrorLog'},
                 minValue: 0,
                 maxValue: 65536,
             };
@@ -1449,8 +1449,9 @@ function AnalysisSessionLogic(){
 
                     var rowid = abc[0].row;
                     var dataTable = new google.visualization.DataTable();
-                    dataTable.addColumn('string','port');
+                    dataTable.addColumn('number','port');
                     dataTable.addColumn('number','count');
+                    //dataTable.addColumn({type: 'number', role: 'annotation'});
                     dataTable.addColumn({type: 'string', role: 'tooltip'});
                     var maxim = 0;
                     for (port = rowid * 1024; port < (rowid * 1024) + 1024; port++) {
@@ -1459,7 +1460,7 @@ function AnalysisSessionLogic(){
 
                     for (port = rowid * 1024; port < (rowid * 1024) + 1024; port++) {
                         if (port in dict) {
-                            dataTable.addRow([port.toString(), dict[port]/maxim,"Port: " + port.toString() + "\nReal number: " + dict[port]]);
+                            dataTable.addRow([port, dict[port]/maxim,"Port: " + port.toString() + "\nReal number: " + dict[port]]);
                         }
                         /*  else {
                          num.push([port,0]);
@@ -1469,9 +1470,10 @@ function AnalysisSessionLogic(){
                         title: nameofdict + "\nNormalised with value: " + maxim,
                        // legend: {position: 'top', maxLines: 2},
                         legend: 'none',
-                        vAxis: {format: 'decimal'},
+                        vAxis: {format: 'decimal',scaleType:'mirrorLog'},
                         minValue: 0,
                         maxValue: 65536,
+                        //annotations: {alwaysOutside: true}
                     };
                     chart.draw(dataTable, google.charts.Bar.convertOptions(options));
                 }
