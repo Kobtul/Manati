@@ -68,34 +68,43 @@
             </div>
             <div class="btn-groupIPS" role="group" aria-label="..." style="display: none;">
             </div>
+
+
+
             <div id="ipsumarytext" style="display: none;">
                 <h3>IP Sumary</h3>
             </div>
             <div class="btn-groupHours" role="group" aria-label="..." style="display: none;">
             </div>
-            <div id="hoursumarytext" style="display: none;">
-                <h3>Hour Sumary</h3>
-            </div>
-            <div id="regionstex" style="display: none;">
-                <h3>Regions</h3>
-            </div>
-            <div id="regions_div">
-            </div><!--style="width: 900px; height: 500px;"></div>-->
+            <div id="ajax_div">
+                 <ul class="nav nav-tabs" id="featurestabs">
+                     <li class="active"><a data-toggle="tab" href="#sumary_tab">Hour Sumary</a></li>
+                     <li><a data-toggle="tab" href="#regions_tab">Regions</a></li>
+                     <li><a data-toggle="tab" href="#histograms_tab">Histograms</a></li>
+                     <li><a data-toggle="tab" href="#tables_tab">Tables</a></li>
+                     <li><a data-toggle="tab" href="#json_tab">JSON</a></li>
 
-            <div id="histograms_div">
-                <h3 id="histogramstext" style="display: none;">Histograms</h3>
-                <!--<div class="chart_div"></div>-->
-            </div>
-            <div id="table_div">
-                <h3 class="tablestext" style="display: none;">Tables</h3>
-            </div>
-            <div id="jsontext" style="display: none;">
-                <h2>JSON</h2>
-            </div>
-            <div id='jsonviz'></div>
+                 </ul>
+                 <div class="tab-content">
+                     <div id="sumary_tab" class="tab-pane active">
+                         <!-- div for the Google charts -->
+                         <div id="sumary_table"></div>
+                     </div>
+                     <div id="regions_tab" class="tab-pane">
+                         <div id="regions_div"></div>
+                     </div>
+                     <div id="histograms_tab" class="tab-pane">
+                         <div id="histograms_div"></div>
+                     </div>
+                     <div id="tables_tab" class="tab-pane">
+                        <div id="table_div"></div>
+                     </div>
+                     <div id="json_tab" class="tab-pane">
+                           <div id='jsonviz'></div>
+                     </div>
+                 </div>
+             </div>
         </div>
-            <div class="col-md-2 ">
-            </div>
     </div>
     {% include 'manati_ui/analysis_session/modal_vt.html' %}
     <style>

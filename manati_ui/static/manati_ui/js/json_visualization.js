@@ -10,42 +10,25 @@ function DrawVisualization() {
 
     google.charts.load('current', {'packages':['geochart','corechart','table','bar']});
     google.charts.setOnLoadCallback(redrawVisualization());
-    /*function regioMap() {
+    function regioMap() {
         $(window).on('drawmap', function (e) {
-            console.log('Google charts loaded'/*, e.countriesDict*//*);
+            console.log('Google charts loaded'/*, e.countriesDict*/);
             //drawRegioMap()
             //Concurrent.Thread.create(drawRegioMap);
         });
-    }*/
+    }
     function redrawVisualization() {
         //if(_selectedIP) {
-        if (typeof _selectedIP !== 'undefined') {
+    /*    if (typeof _selectedIP !== 'undefined') {
+            drawSumaryTable();
             drawRegioMap();
             $('#histograms_div').empty();
-            /*drawHistogram('clientSourcePortNumberOfFlowsTCP');
-             drawHistogram('clientSourcePortNumberOfFlowsUDP');
-
-             drawHistogram('clientSourcePortTotalBytesTCP');
-             drawHistogram('clientSourcePortTotalBytesUDP');
-
-             drawHistogram('clientSourcePortTotalPacketsTCP');
-             drawHistogram('clientSourcePortTotalPacketsUDP');
-
-             drawHistogram('clientDestinationPortNumberOfFlowsTCP');
-             drawHistogram('clientDestinationPortNumberOfFlowsUDP');
-
-
-             drawHistogram('clientDestinationPortTotalBytesTCP');
-             drawHistogram('clientDestinationPortTotalBytesUDP');
-
-             drawHistogram('clientDestinationPortTotalPacketsTCP');
-             drawHistogram('clientDestinationPortTotalPacketsUDP');*/
             drawPortFeatures();
             drawTable('clientDestinationPortDictIPsTCP');
             drawTable('clientDestinationPortDictIPsUDP');
 
 
-        }
+        }*/
     };
     function drawPortFeatures() {
         var s = ['client', 'server'];
@@ -70,8 +53,42 @@ function DrawVisualization() {
     function showCurrentJson() {
         visualizeJSONtoHTML(_jsonprofie[_selectedIP]['hours'][_selectedHour]);
     }
-    this.showJSON = function (json) {
 
+
+    $("a[href='#sumary_tab']").on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr("href") // activated tab
+        //alert(target);
+        if (typeof _selectedIP !== 'undefined') {
+            drawSumaryTable();
+        }
+    });
+    $("a[href='#regions_tab']").on('shown.bs.tab', function (e) {
+        if (typeof _selectedIP !== 'undefined') {
+            drawRegioMap();
+        }
+    });
+    $("a[href='#histograms_tab']").on('shown.bs.tab', function (e) {
+        if (typeof _selectedIP !== 'undefined') {
+            $('#histograms_div').empty();
+            drawPortFeatures();
+        }
+    });
+    $("a[href='#tables_tab']").on('shown.bs.tab', function (e) {
+        if (typeof _selectedIP !== 'undefined') {
+            drawTable('clientDestinationPortDictIPsTCP');
+            drawTable('clientDestinationPortDictIPsUDP');
+        }
+    });
+    $("a[href='#json_tab']").on('shown.bs.tab', function (e) {
+        if (typeof _selectedIP !== 'undefined') {
+            showCurrentJson();
+        }
+    });
+
+    this.showJSON = function (json) {
+    /*$(document).ready(function() {
+        alert("Ready sir")
+    });*/
     //function showJSON(json) {
         _jsonprofie = json;
         $.each(_jsonprofie, function (k, v) {
@@ -83,7 +100,6 @@ function DrawVisualization() {
         $("#viztext").show();
         $(".btn-groupIPS").show();
         $(".btn-groupHours").show();
-
 
         //console.log(json);
 
@@ -124,16 +140,17 @@ function DrawVisualization() {
             $(".btn-groupHours .btn").on("click", function () {
                 _selectedHour = $(this).val();
                 $(this).addClass('btn-success').siblings().removeClass('btn-success');
-                ;
+
                 redrawVisualization();
-                $('#jsonviz').empty();
-                $("#show-raw-json").show();
+                $("a[href='#sumary_tab']").trigger('shown.bs.tab');
+                /*$('#jsonviz').empty();
+                $("#show-raw-json").show();*/
                 //showCurrentJson();
-                $("#hoursumarytext").show();
+                /*$("#hoursumarytext").show();
                 $("#regionstext").show();
                 $("#histogramstext").show();
                 $("#table_div .tablestext").show();
-                $("#jsontext").show();
+                $("#jsontext").show();*/
             });
 
         }
@@ -154,6 +171,7 @@ function DrawVisualization() {
         });
         // $(window).trigger(evt);
         $(window).smartresize(function () {
+            $("ul#featurestabs li.active").trigger('shown.bs.tab');
             redrawVisualization();
         });
     }
@@ -183,6 +201,23 @@ function DrawVisualization() {
         table.draw(data, options);
 
     }
+
+        function drawSumaryTable() {
+        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour]["hoursummary"];
+        var array = [
+            ['Feature', 'Value'],
+        ];
+        for (var feature in dict) {
+            array.push([feature, dict[feature]]);
+        }
+        var data = google.visualization.arrayToDataTable(array);
+        var options = {};
+        var div = document.getElementById("sumary_table");
+        var table = new google.visualization.Table(div);
+        table.draw(data, options);
+
+    }
+
 
 
     function drawHistogram(nameofdict) {
@@ -280,7 +315,7 @@ function DrawVisualization() {
 
                     var rowid = abc[0].row;
                     var dataTable = new google.visualization.DataTable();
-                    dataTable.addColumn('number', 'port');
+                    dataTable.addColumn('string', 'port');
                     dataTable.addColumn('number', 'count');
                     //dataTable.addColumn({type: 'number', role: 'annotation'});
                     dataTable.addColumn({type: 'string', role: 'tooltip'});
@@ -291,7 +326,7 @@ function DrawVisualization() {
 
                     for (port = rowid * 1024; port < (rowid * 1024) + 1024; port++) {
                         if (port in dict) {
-                            dataTable.addRow([port, dict[port] / maxim, "Port: " + port.toString() + "\nReal number: " + dict[port]]);
+                            dataTable.addRow([port.toString(), dict[port] / maxim, "Port: " + port.toString() + "\nReal number: " + dict[port]]);
                         }
                         /*  else {
                          num.push([port,0]);
