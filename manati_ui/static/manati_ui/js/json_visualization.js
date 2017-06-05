@@ -100,7 +100,6 @@ function DrawVisualization() {
         $("#viztext").show();
         $(".btn-groupIPS").show();
         $(".btn-groupHours").show();
-
         //console.log(json);
 
         //var evt = $.Event('drawmap');
@@ -141,24 +140,21 @@ function DrawVisualization() {
                 _selectedHour = $(this).val();
                 $(this).addClass('btn-success').siblings().removeClass('btn-success');
 
-                redrawVisualization();
-                $("a[href='#sumary_tab']").trigger('shown.bs.tab');
-                /*$('#jsonviz').empty();
-                $("#show-raw-json").show();*/
-                //showCurrentJson();
-                /*$("#hoursumarytext").show();
-                $("#regionstext").show();
-                $("#histogramstext").show();
-                $("#table_div .tablestext").show();
-                $("#jsontext").show();*/
+                //redrawVisualization();
+                $("#featurestabs").css('visibility', 'visible');
+                var $link = $('li.active a[data-toggle="tab"]');
+                $link.parent().removeClass('active');
+                var tabLink = $link.attr('href');
+                $('#featurestabs a[href="' + tabLink + '"]').tab('show');
+
             });
 
         }
-        $("#show-raw-json").on("click", function () {
+        /*$("#show-raw-json").on("click", function () {
             if (typeof _selectedIP !== 'undefined') {
                 showCurrentJson();
             }
-        });
+        });*/
         $(".btn-groupIPS .btn").on("click", function () {
             _selectedIP = $(this).val();
             //$(this).removeClass('btn btn-default');
@@ -171,8 +167,10 @@ function DrawVisualization() {
         });
         // $(window).trigger(evt);
         $(window).smartresize(function () {
-            $("ul#featurestabs li.active").trigger('shown.bs.tab');
-            redrawVisualization();
+            var $link = $('li.active a[data-toggle="tab"]');
+            $link.parent().removeClass('active');
+            var tabLink = $link.attr('href');
+            $('#featurestabs a[href="' + tabLink + '"]').tab('show');
         });
     }
 

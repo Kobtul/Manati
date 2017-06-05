@@ -45,7 +45,7 @@
                     {% if user.is_authenticated %}
                         <input type="button" id="save-table" class="btn btn-primary" value="Save!" />
                     {% endif %}
-                    <input type="button" id="show-raw-json" class="btn btn-primary" value="Show JSON" />
+                    <!--<input type="button" id="show-raw-json" class="btn btn-primary" value="Show JSON" />-->
 
 
 
@@ -76,32 +76,30 @@
             </div>
             <div class="btn-groupHours" role="group" aria-label="..." style="display: none;">
             </div>
-            <div id="ajax_div">
-                 <ul class="nav nav-tabs" id="featurestabs">
-                     <li class="active"><a data-toggle="tab" href="#sumary_tab">Hour Sumary</a></li>
-                     <li><a data-toggle="tab" href="#regions_tab">Regions</a></li>
-                     <li><a data-toggle="tab" href="#histograms_tab">Histograms</a></li>
-                     <li><a data-toggle="tab" href="#tables_tab">Tables</a></li>
-                     <li><a data-toggle="tab" href="#json_tab">JSON</a></li>
+             <ul class="nav nav-tabs" id="featurestabs" style="visibility: hidden">
+                 <li class="active"><a data-toggle="tab" href="#sumary_tab">Hour Sumary</a></li>
+                 <li><a data-toggle="tab" href="#regions_tab">Regions</a></li>
+                 <li><a data-toggle="tab" href="#histograms_tab">Histograms</a></li>
+                 <li><a data-toggle="tab" href="#tables_tab">Tables</a></li>
+                 <li><a data-toggle="tab" href="#json_tab">JSON</a></li>
 
-                 </ul>
-                 <div class="tab-content">
-                     <div id="sumary_tab" class="tab-pane active">
-                         <!-- div for the Google charts -->
-                         <div id="sumary_table"></div>
-                     </div>
-                     <div id="regions_tab" class="tab-pane">
-                         <div id="regions_div"></div>
-                     </div>
-                     <div id="histograms_tab" class="tab-pane">
-                         <div id="histograms_div"></div>
-                     </div>
-                     <div id="tables_tab" class="tab-pane">
-                        <div id="table_div"></div>
-                     </div>
-                     <div id="json_tab" class="tab-pane">
-                           <div id='jsonviz'></div>
-                     </div>
+             </ul>
+             <div class="tab-content">
+                 <div id="sumary_tab" class="tab-pane active">
+                     <!-- div for the Google charts -->
+                     <div id="sumary_table"></div>
+                 </div>
+                 <div id="regions_tab" class="tab-pane">
+                     <div id="regions_div"></div>
+                 </div>
+                 <div id="histograms_tab" class="tab-pane">
+                     <div id="histograms_div"></div>
+                 </div>
+                 <div id="tables_tab" class="tab-pane">
+                    <div id="table_div"></div>
+                 </div>
+                 <div id="json_tab" class="tab-pane">
+                       <div id='jsonviz'></div>
                  </div>
              </div>
         </div>
