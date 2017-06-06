@@ -56,7 +56,7 @@ function DrawVisualization() {
 
 
     $("a[href='#sumary_tab']").on('shown.bs.tab', function (e) {
-        var target = $(e.target).attr("href") // activated tab
+        var target = $(e.target).attr("href"); // activated tab
         //alert(target);
         if (typeof _selectedIP !== 'undefined') {
             drawSumaryTable();
@@ -64,7 +64,9 @@ function DrawVisualization() {
     });
     $("a[href='#regions_tab']").on('shown.bs.tab', function (e) {
         if (typeof _selectedIP !== 'undefined') {
-            drawRegioMap();
+            drawRegioMap('clientDictNumberOfDistinctCountries');
+            drawRegioMap('serverDictNumberOfDistinctCountries');
+
         }
     });
     $("a[href='#histograms_tab']").on('shown.bs.tab', function (e) {
@@ -80,6 +82,9 @@ function DrawVisualization() {
         }
     });
     $("a[href='#json_tab']").on('shown.bs.tab', function (e) {
+        /*if ($(this).hasClass("active")) {
+            return false;
+        }*/
         if (typeof _selectedIP !== 'undefined') {
             showCurrentJson();
         }
@@ -172,7 +177,7 @@ function DrawVisualization() {
             var tabLink = $link.attr('href');
             $('#featurestabs a[href="' + tabLink + '"]').tab('show');
         });
-    }
+    };
 
     function drawTable(name) {
         dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][name];
@@ -182,11 +187,11 @@ function DrawVisualization() {
             $("<h4>" + (name) + ":</h4>").insertBefore('#table_div' + ' .' + name);
         }
         var small = [
-            ['Port', 'IPs'],
+            ['Port','Total Number', 'IPs'],
         ];
 
         for (var port in dict) {
-            small.push([port, Object.keys(dict[port]).toString()]);
+            small.push([port,Object.keys(dict[port]).length,Object.keys(dict[port]).join('; ')]);
         }
 
         var data = google.visualization.arrayToDataTable(small);
@@ -363,10 +368,15 @@ function DrawVisualization() {
         dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][nameofdict];
     }
 
-    function drawRegioMap() {
+    function drawRegioMap(name) {
 
-        countriesDict = _jsonprofie[_selectedIP]['hours'][_selectedHour]['clientDictNumberOfDistinctCountries'];
-        console.log(countriesDict);
+        countriesDict = _jsonprofie[_selectedIP]['hours'][_selectedHour][name];
+        if ($('#regions_div' + ' .' + name).length == 0) {
+            var regiodiv = $('<div/>').attr({class: name, type: 'div'});
+            $('#regions_div').append("<h4>" + name + ":</h4>");
+            $('#regions_div').append(regiodiv);
+
+        }
         if (Object.keys(countriesDict).length > 0) {
             var dataTable = new google.visualization.DataTable();
             dataTable.addColumn('string', 'Country');
@@ -387,8 +397,9 @@ function DrawVisualization() {
             var options = {
                 legend: 'none'
             };
-
-            var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+            var parent = document.getElementById("regions_div");
+            var child = parent.getElementsByClassName(name)[0];
+            var chart = new google.visualization.GeoChart(child/*document.getElementById('regions_div')*/);
 
             chart.draw(dataTable, options);
         }
