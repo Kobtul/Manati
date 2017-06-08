@@ -1,6 +1,7 @@
 var _selectedIP;
+var _selectedDate;
 var _selectedHour;
-var _jsonprofie;
+var _jsonprofile;
 var _hoursarray;
 /**
  * Created by david on 5.6.17.
@@ -51,7 +52,7 @@ function DrawVisualization() {
     }
 
     function showCurrentJson() {
-        visualizeJSONtoHTML(_jsonprofie[_selectedIP]['hours'][_selectedHour]);
+        visualizeJSONtoHTML(_jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]);
     }
 
 
@@ -89,22 +90,115 @@ function DrawVisualization() {
             showCurrentJson();
         }
     });
+    function generateIPLayerOfButtons()
+    {
+        $(".btn-groupIPS").empty();
+        $(".btn-groupIPS").show();
 
+        $.each(_jsonprofile, function (k, v) {
+            //display the key and value pair
+            //alert(k + ' is ' + v);
+            var $something = $('<input/>').attr({class: "btn btn-default ipbuttons", type: 'button', name: 'btn1', value: k});
+            $(".btn-groupIPS").append($something);
+        });
+        $(".btn-groupIPS .btn").on("click", function (e) {
+            _selectedIP = $(this).val();
+            e.preventDefault();
+            //$(this).removeClass('btn btn-default');
+            $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
+            //$("#ipsumarytext").show();
+            generateDayLayerOfButtons();
+            //redrawVisualization();
+            //drawRegioMap()
+            //alert("Value is " + n);
+        });
+    }
+    function generateDayLayerOfButtons() {
+        $(".btn-groupDays").empty();
+        $(".btn-groupDays").show();
+        //btn-groupDays
+        var days = [];
+        $.each(_jsonprofile[_selectedIP]["time"], function (k, v) {
+            days.push(k);
+            //var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
+            //$(".btn-groupHours").append($something);
+        });
+        days.sort();
+        for (var i = 0; i < days.length; i++) {
+            var $something2 = $('<input/>').attr({
+                class: "btn btn-default daybuttons",
+                type: 'button',
+                name: 'btn2',
+                value: days[i]
+            });
+            if(_selectedDate == days[i])
+            {
+                $something2.addClass('btn-purple');
+            }
+            $(".btn-groupDays").append($something2);
+        }
+        if(typeof _selectedHour !== 'undefined')
+        {
+            generateHourLayerOfButtons();
+        }
+        $(".btn-groupDays .btn").on("click", function (e) {
+            _selectedDate = $(this).val();
+            e.preventDefault();
+            $(this).addClass('btn-purple').siblings().removeClass('btn-purple');
+            generateHourLayerOfButtons();
+        });
+    }
+    function generateHourLayerOfButtons() {
+        var hours = [];
+        $(".btn-groupHours").empty();
+        $(".btn-groupHours").show();
+
+        $.each(_jsonprofile[_selectedIP]["time"][_selectedDate], function (k, v) {
+            hours.push(k);
+            //var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
+            //$(".btn-groupHours").append($something);
+        });
+        hours.sort();
+        for (var i = 0; i < hours.length; i++) {
+            var $something = $('<input/>').attr({
+                class: "btn btn-default hourbuttons",
+                type: 'button',
+                name: 'btn3',
+                value: hours[i]
+            });
+            if(_selectedHour == hours[i])
+            {
+                $something.addClass('btn-success');
+                refreshTab();
+            }
+            $(".btn-groupHours").append($something);
+        }
+        $(".btn-groupHours .btn").on("click", function (e) {
+            _selectedHour = $(this).val();
+            e.preventDefault();
+            $(this).addClass('btn-success').siblings().removeClass('btn-success');
+            refreshTab();
+
+
+        });
+    }
+    function refreshTab()
+    {
+        $("#featurestabs").css('visibility', 'visible');
+        var $link = $('li.active a[data-toggle="tab"]');
+        $link.parent().removeClass('active');
+        var tabLink = $link.attr('href');
+        $('#featurestabs a[href="' + tabLink + '"]').tab('show');
+    }
     this.showJSON = function (json) {
+        _jsonprofile = json;
     /*$(document).ready(function() {
         alert("Ready sir")
     });*/
     //function showJSON(json) {
-        _jsonprofie = json;
-        $.each(_jsonprofie, function (k, v) {
-            //display the key and value pair
-            //alert(k + ' is ' + v);
-            var $something = $('<input/>').attr({class: "btn btn-default", type: 'button', name: 'btn1', value: k});
-            $(".btn-groupIPS").append($something);
-        });
+        generateIPLayerOfButtons();
+
         $("#viztext").show();
-        $(".btn-groupIPS").show();
-        $(".btn-groupHours").show();
         //console.log(json);
 
         //var evt = $.Event('drawmap');
@@ -123,53 +217,11 @@ function DrawVisualization() {
                 prevbutton.click();
             }
         });
-        function generateHourLayerOfButtons() {
-            var hours = [];
-            $(".btn-groupHours").empty();
-            $.each(_jsonprofie[_selectedIP]['hours'], function (k, v) {
-                hours.push(k);
-                //var $something= $('<input/>').attr({ class: "btn btn-default",type: 'button', name:'btn1', value:k});
-                //$(".btn-groupHours").append($something);
-            });
-            hours.sort();
-            for (var i = 0; i < hours.length; i++) {
-                var $something = $('<input/>').attr({
-                    class: "btn btn-default",
-                    type: 'button',
-                    name: 'btn1',
-                    value: hours[i]
-                });
-                $(".btn-groupHours").append($something);
-            }
-            $(".btn-groupHours .btn").on("click", function () {
-                _selectedHour = $(this).val();
-                $(this).addClass('btn-success').siblings().removeClass('btn-success');
-
-                //redrawVisualization();
-                $("#featurestabs").css('visibility', 'visible');
-                var $link = $('li.active a[data-toggle="tab"]');
-                $link.parent().removeClass('active');
-                var tabLink = $link.attr('href');
-                $('#featurestabs a[href="' + tabLink + '"]').tab('show');
-
-            });
-
-        }
         /*$("#show-raw-json").on("click", function () {
             if (typeof _selectedIP !== 'undefined') {
                 showCurrentJson();
             }
         });*/
-        $(".btn-groupIPS .btn").on("click", function () {
-            _selectedIP = $(this).val();
-            //$(this).removeClass('btn btn-default');
-            $(this).addClass('btn-primary').siblings().removeClass('btn-primary');
-            $("#ipsumarytext").show();
-            generateHourLayerOfButtons();
-            //redrawVisualization();
-            //drawRegioMap()
-            //alert("Value is " + n);
-        });
         // $(window).trigger(evt);
         $(window).smartresize(function () {
             var $link = $('li.active a[data-toggle="tab"]');
@@ -180,7 +232,7 @@ function DrawVisualization() {
     };
 
     function drawTable(name) {
-        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][name];
+        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
         if ($('#table_div' + ' .' + name).length == 0) {
             var $tcp = $('<div/>').attr({class: name, type: 'div'});
             $('#table_div').append($tcp);
@@ -206,7 +258,7 @@ function DrawVisualization() {
     }
 
         function drawSumaryTable() {
-        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour]["hoursummary"];
+        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]["hoursummary"];
         var array = [
             ['Feature', 'Value'],
         ];
@@ -226,7 +278,7 @@ function DrawVisualization() {
     function drawHistogram(nameofdict) {
         //  <div id="chart_div"></div>
         //console.log("aaaaaaaaaaa");
-        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][nameofdict];
+        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
         if ($('#histograms_div' + ' .' + nameofdict).length == 0) {
             var $histdiv = $('<div/>').attr({class: nameofdict, type: 'div'});
             $('#histograms_div').append($histdiv);
@@ -313,7 +365,7 @@ function DrawVisualization() {
                 current = 1 - current;
                 if (current == 1) {
                     // alert(current);
-                    dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][nameofdict];
+                    dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
                     var abc = chart.getSelection();
 
                     var rowid = abc[0].row;
@@ -365,12 +417,12 @@ function DrawVisualization() {
     }
 
     function drawNumberOfFlowsComparison() {
-        dict = _jsonprofie[_selectedIP]['hours'][_selectedHour][nameofdict];
+        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
     }
 
     function drawRegioMap(name) {
 
-        countriesDict = _jsonprofie[_selectedIP]['hours'][_selectedHour][name];
+        countriesDict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
         if ($('#regions_div' + ' .' + name).length == 0) {
             var regiodiv = $('<div/>').attr({class: name, type: 'div'});
             $('#regions_div').append("<h4>" + name + ":</h4>");
