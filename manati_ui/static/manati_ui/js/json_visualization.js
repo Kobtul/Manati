@@ -90,6 +90,9 @@ function DrawVisualization() {
             showCurrentJson();
         }
     });
+    $('#logcheckbox').change(function() {
+        refreshTab();
+    });
     function generateIPLayerOfButtons()
     {
         $(".btn-groupIPS").empty();
@@ -133,7 +136,7 @@ function DrawVisualization() {
             });
             if(_selectedDate == days[i])
             {
-                $something2.addClass('btn-purple');
+                $something2.addClass('btn-info');
             }
             $(".btn-groupDays").append($something2);
         }
@@ -144,7 +147,7 @@ function DrawVisualization() {
         $(".btn-groupDays .btn").on("click", function (e) {
             _selectedDate = $(this).val();
             e.preventDefault();
-            $(this).addClass('btn-purple').siblings().removeClass('btn-purple');
+            $(this).addClass('btn-info').siblings().removeClass('btn-info');
             generateHourLayerOfButtons();
         });
     }
@@ -243,7 +246,7 @@ function DrawVisualization() {
         ];
 
         for (var port in dict) {
-            small.push([port,Object.keys(dict[port]).length,Object.keys(dict[port]).join('; ')]);
+            small.push([port,Object.keys(dict[port]).length,Object.keys(dict[port]).join(', ')]);
         }
 
         var data = google.visualization.arrayToDataTable(small);
@@ -276,11 +279,17 @@ function DrawVisualization() {
 
 
     function drawHistogram(nameofdict) {
-        //  <div id="chart_div"></div>
-        //console.log("aaaaaaaaaaa");
+        var uselogscale;
+        if ($('#logcheckbox').is(":checked"))
+        {
+            uselogscale = 'mirrorLog';
+        }
+        else {
+            uselogscale = 'null';
+        }
         dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
         if ($('#histograms_div' + ' .' + nameofdict).length == 0) {
-            var $histdiv = $('<div/>').attr({class: nameofdict, type: 'div'});
+            var $histdiv = $('<div/>').attr({class: nameofdict, type: 'div' ,value: 0});
             $('#histograms_div').append($histdiv);
 
         }
@@ -343,7 +352,7 @@ function DrawVisualization() {
             legend: 'none',
             // tooltip: {textStyle: {color: '#03f8ff'}, showColorCode: true},
 
-            vAxis: {format: 'decimal', scaleType: 'mirrorLog'},
+            vAxis: {format: 'decimal', scaleType: uselogscale},
             minValue: 0,
             maxValue: 65536,
         };
@@ -383,15 +392,12 @@ function DrawVisualization() {
                         if (port in dict) {
                             dataTable.addRow([port.toString(), dict[port] / maxim, "Port: " + port.toString() + "\nReal number: " + dict[port]]);
                         }
-                        /*  else {
-                         num.push([port,0]);
-                         }*/
                     }
                     var options = {
                         title: nameofdict + "\nNormalised with value: " + maxim,
                         // legend: {position: 'top', maxLines: 2},
                         legend: 'none',
-                        vAxis: {format: 'decimal', scaleType: 'mirrorLog'},
+                        vAxis: {format: 'decimal', scaleType: uselogscale},
                         minValue: 0,
                         maxValue: 65536,
                         //annotations: {alwaysOutside: true}
@@ -423,13 +429,14 @@ function DrawVisualization() {
     function drawRegioMap(name) {
 
         countriesDict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
-        if ($('#regions_div' + ' .' + name).length == 0) {
-            var regiodiv = $('<div/>').attr({class: name, type: 'div'});
-            $('#regions_div').append("<h4>" + name + ":</h4>");
-            $('#regions_div').append(regiodiv);
-
-        }
         if (Object.keys(countriesDict).length > 0) {
+            if ($('#regions_div' + ' .' + name).length == 0) {
+                var regiodiv = $('<div/>').attr({class: name, type: 'div'});
+                $('#regions_div').append("<h4>" + name + ":</h4>");
+                $('#regions_div').append(regiodiv);
+            }
+
+
             var dataTable = new google.visualization.DataTable();
             dataTable.addColumn('string', 'Country');
             dataTable.addColumn('number', 'Number of flows');
@@ -457,6 +464,9 @@ function DrawVisualization() {
         }
         else {
             $("#regions_div").empty();
+            if ($('#regions_div' + ' .nodataavaible').length == 0) {
+                $('#regions_div').append("<h4 class='nodataavaible'>No data avaible</h4>");
+            }
         }
 
         /*       var chart = new google.visualization.ChartWrapper({
