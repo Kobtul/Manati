@@ -205,3 +205,23 @@ INFO 2017-06-06 07:58:54,731 driver 8882 140330927273728 Generating grammar tabl
 INFO 2017-06-06 07:58:54,778 driver 8882 140330927273728 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
 INFO 2017-06-06 07:58:55,177 driver 8886 140335431485184 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
 INFO 2017-06-06 07:58:55,218 driver 8886 140335431485184 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-06-08 12:13:37,187 driver 5301 139961080280832 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-08 12:13:37,251 driver 5301 139961080280832 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-06-08 12:13:37,772 driver 5306 140324202964736 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-08 12:13:37,800 driver 5306 140324202964736 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-06-08 19:32:02,799 driver 28396 140383339403008 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-08 19:32:02,829 driver 28396 140383339403008 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-06-08 19:32:03,164 driver 28399 140583222929152 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-08 19:32:03,193 driver 28399 140583222929152 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-06-09 14:01:22,374 driver 19681 140179559405312 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-09 14:01:22,424 driver 19681 140179559405312 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-06-09 14:01:22,870 driver 19688 139840883889920 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-09 14:01:22,899 driver 19688 139840883889920 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+WARNING 2017-06-09 14:19:14,180 csrf 19688 139840602392320 Forbidden (CSRF token missing or incorrect.): /manati_project/manati_ui/analysis_session/-1/publish
+WARNING 2017-06-09 14:19:14,180 csrf 19688 139840602392320 Forbidden (CSRF token missing or incorrect.): /manati_project/manati_ui/analysis_session/-1/publish
+WARNING 2017-06-09 14:19:19,252 csrf 19688 139840602392320 Forbidden (CSRF token missing or incorrect.): /manati_project/manati_ui/analysis_session/-1/publish
+WARNING 2017-06-09 14:19:19,252 csrf 19688 139840602392320 Forbidden (CSRF token missing or incorrect.): /manati_project/manati_ui/analysis_session/-1/publish
+INFO 2017-06-09 14:19:44,087 driver 21746 140503191594752 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-09 14:19:44,136 driver 21746 140503191594752 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
+INFO 2017-06-09 14:19:44,867 driver 21753 140626673653504 Generating grammar tables from /usr/lib/python2.7/lib2to3/Grammar.txt
+INFO 2017-06-09 14:19:44,930 driver 21753 140626673653504 Generating grammar tables from /usr/lib/python2.7/lib2to3/PatternGrammar.txt
