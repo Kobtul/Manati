@@ -79,9 +79,12 @@
              <ul class="nav nav-tabs" id="featurestabs" style="visibility: hidden">
                  <li class="active"><a data-toggle="tab" href="#sumary_tab">Hour Sumary</a></li>
                  <li><a data-toggle="tab" href="#regions_tab">Regions</a></li>
+                 <li><a data-toggle="tab" href="#donutchart_tab">Donuts</a></li>
+
                  <li><a data-toggle="tab" href="#histograms_tab">Histograms</a></li>
                  <li><a data-toggle="tab" href="#tables_tab">Tables</a></li>
                  <li><a data-toggle="tab" href="#json_tab">JSON</a></li>
+                 <li><a data-toggle="tab" href="#testing_tab">Testing</a></li>
 
              </ul>
              <div class="tab-content">
@@ -92,12 +95,15 @@
                  <div id="regions_tab" class="tab-pane">
                      <div id="regions_div"></div>
                  </div>
+                 <div id="donutchart_tab" class="tab-pane">
+                     <div id="donutchart_div"></div>
+                 </div>
                  <div id="histograms_tab" class="tab-pane">
                      <div class="checkbox text-center">
-                        <label style="font-size: 2em">
-                            <input id="logcheckbox" type="checkbox" value="" checked>
+                        <label style="font-size: 1.5em">
+                            <input id="logcheckbox" type="checkbox" value="">
                             <span class="cr"><i class="cr-icon fa fa-check"></i></span>
-                            Use logarithm scale
+                            Use logarithm scale. Better for visibility of small values.
                         </label>
                     </div>
                      <div id="histograms_div"></div>
@@ -107,6 +113,11 @@
                  </div>
                  <div id="json_tab" class="tab-pane">
                        <div id='jsonviz'></div>
+                 </div>
+                 <div id="testing_tab" class="tab-pane">
+                     <table id="table_id" class="display table table-striped table-bordered table-hover">
+
+                    </table>
                  </div>
              </div>
         </div>

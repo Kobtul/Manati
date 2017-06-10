@@ -30,6 +30,21 @@
     z-index: 999;
 }
 
+/*.donutchart{
+   position:  absolute;
+   top: 0;
+   left: 0;
+   bottom: 0;
+   right: 0;
+}
+
+#donutchart_div {
+   position: relative;
+   width: 100%;
+   padding-top: 56.6%;
+
+}*/
+
 .checkbox label:after,
 .radio label:after {
     content: '';

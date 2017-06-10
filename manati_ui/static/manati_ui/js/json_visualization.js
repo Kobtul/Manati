@@ -3,6 +3,7 @@ var _selectedDate;
 var _selectedHour;
 var _jsonprofile;
 var _hoursarray;
+var datatable;
 /**
  * Created by david on 5.6.17.
  */
@@ -70,6 +71,14 @@ function DrawVisualization() {
 
         }
     });
+
+    $("a[href='#donutchart_tab']").on('shown.bs.tab', function (e) {
+        if (typeof _selectedIP !== 'undefined') {
+            drawDonutChart('clientDictClassBnetworks');
+            drawDonutChart('serverDictClassBnetworks');
+
+        }
+    });
     $("a[href='#histograms_tab']").on('shown.bs.tab', function (e) {
         if (typeof _selectedIP !== 'undefined') {
             $('#histograms_div').empty();
@@ -80,6 +89,8 @@ function DrawVisualization() {
         if (typeof _selectedIP !== 'undefined') {
             drawTable('clientDestinationPortDictIPsTCP');
             drawTable('clientDestinationPortDictIPsUDP');
+            drawTable('serverSourcePortDictIPsTCP');
+            drawTable('serverSourcePortDictIPsUDP');
         }
     });
     $("a[href='#json_tab']").on('shown.bs.tab', function (e) {
@@ -90,6 +101,30 @@ function DrawVisualization() {
             showCurrentJson();
         }
     });
+        $("a[href='#testing_tab']").on('shown.bs.tab', function (e) {
+
+            var mydict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]['clientDictOfNonAnsweredConnections'];
+            var data = [];
+
+            for (var x in mydict) {
+                data.push([x, mydict[x]]);
+            }
+            if(datatable != null || datatable != undefined) {
+                datatable.clear().draw();
+                datatable.rows.add(data); // Add new data
+                datatable.columns.adjust().draw(); // Redraw the DataTable
+            }
+            else {
+                datatable = $('#table_id').DataTable({
+                    data: data,
+                    columns: [
+                        {title: "Attempted connection"},
+                        {title: "Number of tries"},
+                    ]
+                });
+            }
+        });
+
     $('#logcheckbox').change(function() {
         refreshTab();
     });
@@ -251,7 +286,10 @@ function DrawVisualization() {
 
         var data = google.visualization.arrayToDataTable(small);
 
-        var options = {}
+        var options = {
+            page: true,
+            pageSize: 10,
+        }
         var parent = document.getElementById("table_div");
         var child = parent.getElementsByClassName(name)[0];
 
@@ -287,7 +325,7 @@ function DrawVisualization() {
         else {
             uselogscale = 'null';
         }
-        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
+        var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
         if ($('#histograms_div' + ' .' + nameofdict).length == 0) {
             var $histdiv = $('<div/>').attr({class: nameofdict, type: 'div' ,value: 0});
             $('#histograms_div').append($histdiv);
@@ -374,7 +412,7 @@ function DrawVisualization() {
                 current = 1 - current;
                 if (current == 1) {
                     // alert(current);
-                    dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
+                    var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
                     var abc = chart.getSelection();
 
                     var rowid = abc[0].row;
@@ -423,12 +461,38 @@ function DrawVisualization() {
     }
 
     function drawNumberOfFlowsComparison() {
-        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
+       var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
     }
+    function drawDonutChart(nameofdict)
+    {
+        var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
+        if ($('#donutchart_div' + ' .' + nameofdict).length == 0) {
+                var div = $('<div/>').attr({class: nameofdict+ " donutchart", type: 'div'});
+                //$('#regions_div').append("<h4>" + nameofdict + ":</h4>");
+                $('#donutchart_div').append(div);
+        }
+        var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'ClassB IP');
+            dataTable.addColumn('number', 'Number of flows to the ClassB network');
+            //dataTable.addColumn({type: 'string', role: 'tooltip'});
 
+        for (var classB in dict) {
+                dataTable.addRow([classB, dict[classB]]);
+        }
+        var options = {
+          title: nameofdict,
+          //is3D: true,
+          pieHole: 0.4,
+        };
+
+        var parent = document.getElementById("donutchart_div");
+        var child = parent.getElementsByClassName(nameofdict)[0];
+        var chart = new google.visualization.PieChart(child/*document.getElementById('regions_div')*/);
+        chart.draw(dataTable, options);
+    }
     function drawRegioMap(name) {
 
-        countriesDict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
+        var countriesDict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
         if (Object.keys(countriesDict).length > 0) {
             if ($('#regions_div' + ' .' + name).length == 0) {
                 var regiodiv = $('<div/>').attr({class: name, type: 'div'});
@@ -463,9 +527,9 @@ function DrawVisualization() {
             chart.draw(dataTable, options);
         }
         else {
-            $("#regions_div").empty();
-            if ($('#regions_div' + ' .nodataavaible').length == 0) {
-                $('#regions_div').append("<h4 class='nodataavaible'>No data avaible</h4>");
+            if($('#regions_div' + ' .' + name).length == 0) {
+                var regiodiv = $('<div/>').attr({class: name, type: 'div'});
+                $('#regions_div').append("<h4> No data avaible </h4>");
             }
         }
 
