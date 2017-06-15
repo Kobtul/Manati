@@ -60,8 +60,8 @@
         </div>
     </div>
     <div class="row">
-        <input type="button" id="backbutton"    class="backbutton btn">
-        <input type="button" id="forwardbutton" class="forwardbutton btn">
+        <input type="button" id="backbutton"    class="backbutton btn" style="display: none;">
+        <input type="button" id="forwardbutton" class="forwardbutton btn" style="display: none;">
         <div class="col-md-12">
             <div id="viztext" style="display: none;">
                 <h2>Visualization</h2>
@@ -79,18 +79,23 @@
              <ul class="nav nav-tabs" id="featurestabs" style="visibility: hidden">
                  <li class="active"><a data-toggle="tab" href="#sumary_tab">Hour Sumary</a></li>
                  <li><a data-toggle="tab" href="#regions_tab">Regions</a></li>
-                 <li><a data-toggle="tab" href="#donutchart_tab">Donuts</a></li>
+                 <li><a data-toggle="tab" href="#donutchart_tab">Class B networks</a></li>
 
-                 <li><a data-toggle="tab" href="#histograms_tab">Histograms</a></li>
-                 <li><a data-toggle="tab" href="#tables_tab">Tables</a></li>
+                 <li><a data-toggle="tab" href="#histograms_tab">Port features</a></li>
+                 <li><a data-toggle="tab" href="#tables_tab">IPs for ports</a></li>
+                 <li><a data-toggle="tab" href="#notanweredconnections_tab">Not answered connections</a></li>
+
                  <li><a data-toggle="tab" href="#json_tab">JSON</a></li>
+
                  <li><a data-toggle="tab" href="#testing_tab">Testing</a></li>
 
              </ul>
              <div class="tab-content">
                  <div id="sumary_tab" class="tab-pane active">
                      <!-- div for the Google charts -->
-                     <div id="sumary_table"></div>
+                     <!--<div id="sumary_table"></div>-->
+                     <table id="sumary_table" class="display table table-striped table-bordered table-hover"></table>
+
                  </div>
                  <div id="regions_tab" class="tab-pane">
                      <div id="regions_div"></div>
@@ -114,12 +119,58 @@
                  <div id="json_tab" class="tab-pane">
                        <div id='jsonviz'></div>
                  </div>
+                 <div id="notanweredconnections_tab" class="tab-pane">
+                     <div id="notanweredconnections_div"></div>
+                     <!--<table id="table_id" class="display table table-striped table-bordered table-hover"></table>-->
+                 </div>
                  <div id="testing_tab" class="tab-pane">
-                     <table id="table_id" class="display table table-striped table-bordered table-hover">
 
-                    </table>
                  </div>
              </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+                <div class="panel panel-default" id="panel-datatable">
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#home" data-toggle="tab">Home</a>
+                            </li>
+                            <li id="statical-nav" style="display: none;"><a href="#statical-section" data-toggle="tab">Statistics Section</a>
+                            </li>
+                            {% if user.is_authenticated %}
+                            <li id="coments-as-nav" style="display: none;"><a href="#comment-section" data-toggle="tab">Comments</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="home">
+                                <br/>
+                                {% include 'manati_ui/analysis_session/table_options.html' %}
+                                <table class="table table-striped table-bordered table-hover weblogs-datatable"  cellspacing="0" width="100%" id="weblogs-datatable">
+                                </table>
+                            </div>
+                            <div class="tab-pane fade" id="statical-section"></div>
+                            {% if user.is_authenticated %}
+                            <div class="tab-pane fade" id="comment-section">
+                                <form  method="POST" id="comment-form" action='' class="form" method="post" role="form">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <textarea class="form-control" rows="10" maxlength="255" name="text">{{ comment.text   }}</textarea>
+                                    </div>
+                                <input type="submit" class="btn btn-success" value="Update Comment" />
+                                </form>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
     </div>
     {% include 'manati_ui/analysis_session/modal_vt.html' %}

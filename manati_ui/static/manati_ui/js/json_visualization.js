@@ -3,7 +3,8 @@ var _selectedDate;
 var _selectedHour;
 var _jsonprofile;
 var _hoursarray;
-var datatable;
+var _datatable;
+var _datatables = {};
 /**
  * Created by david on 5.6.17.
  */
@@ -101,33 +102,162 @@ function DrawVisualization() {
             showCurrentJson();
         }
     });
-        $("a[href='#testing_tab']").on('shown.bs.tab', function (e) {
-
-            var mydict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]['clientDictOfNonAnsweredConnections'];
-            var data = [];
-
-            for (var x in mydict) {
-                data.push([x, mydict[x]]);
-            }
-            if(datatable != null || datatable != undefined) {
-                datatable.clear().draw();
-                datatable.rows.add(data); // Add new data
-                datatable.columns.adjust().draw(); // Redraw the DataTable
-            }
-            else {
-                datatable = $('#table_id').DataTable({
-                    data: data,
-                    columns: [
-                        {title: "Attempted connection"},
-                        {title: "Number of tries"},
-                    ]
-                });
-            }
-        });
+    $("a[href='#notanweredconnections_tab']").on('shown.bs.tab', function (e) {
+        drawDataTable('clientDictOfNonAnsweredConnections');
+        drawDataTable('serverDictOfNonAnsweredConnections');
+    });
+    $("a[href='#testing_tab']").on('shown.bs.tab', function (e) {
+        newJsonStyle();
+    });
 
     $('#logcheckbox').change(function() {
         refreshTab();
     });
+    function newJsonStyle() {
+        var margin = {top: 30, right: 20, bottom: 30, left: 20},
+            width = 960 - margin.left - margin.right,
+            barHeight = 20,
+            barWidth = width * .8;
+
+        var i = 0,
+            duration = 400,
+            root;
+
+        var tree = d3.layout.tree()
+            .nodeSize([0, 20]);
+
+        var diagonal = d3.svg.diagonal()
+            .projection(function(d) { return [d.y, d.x]; });
+
+        var svg = d3.select("#testing_tab").append("svg")
+            .attr("width", width + margin.left + margin.right)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        d3.json("result.json", function(error, flare) {
+          if (error) throw error;
+
+          flare.x0 = 0;
+          flare.y0 = 0;
+          update(root = flare);
+        });
+       /* _jsonprofile.x0 = 0;
+        _jsonprofile.y0 = 0;
+
+        update(root = _jsonprofile);*/
+
+        function update(source) {
+
+                  // Compute the flattened node list. TODO use d3.layout.hierarchy.
+                  var nodes = tree.nodes(root);
+
+                  var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom);
+
+                  d3.select("svg").transition()
+                      .duration(duration)
+                      .attr("height", height);
+
+                  d3.select(self.frameElement).transition()
+                      .duration(duration)
+                      .style("height", height + "px");
+
+                  // Compute the "layout".
+                  nodes.forEach(function(n, i) {
+                    n.x = i * barHeight;
+                  });
+
+                  // Update the nodes…
+                  var node = svg.selectAll("g.node")
+                      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+                  var nodeEnter = node.enter().append("g")
+                      .attr("class", "node")
+                      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+                      .style("opacity", 1e-6);
+
+                  // Enter any new nodes at the parent's previous position.
+                  nodeEnter.append("rect")
+                      .attr("y", -barHeight / 2)
+                      .attr("height", barHeight)
+                      .attr("width", barWidth)
+                      .style("fill", color)
+                      .on("click", click);
+
+                  nodeEnter.append("text")
+                      .attr("dy", 3.5)
+                      .attr("dx", 5.5)
+                      .text(function(d) { return d.name; });
+
+                  // Transition nodes to their new position.
+                  nodeEnter.transition()
+                      .duration(duration)
+                      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+                      .style("opacity", 1);
+
+                  node.transition()
+                      .duration(duration)
+                      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+                      .style("opacity", 1)
+                    .select("rect")
+                      .style("fill", color);
+
+                  // Transition exiting nodes to the parent's new position.
+                  node.exit().transition()
+                      .duration(duration)
+                      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+                      .style("opacity", 1e-6)
+                      .remove();
+
+                  // Update the links…
+                  var link = svg.selectAll("path.link")
+                      .data(tree.links(nodes), function(d) { return d.target.id; });
+
+                  // Enter any new links at the parent's previous position.
+                  link.enter().insert("path", "g")
+                      .attr("class", "link")
+                      .attr("d", function(d) {
+                        var o = {x: source.x0, y: source.y0};
+                        return diagonal({source: o, target: o});
+                      })
+                    .transition()
+                      .duration(duration)
+                      .attr("d", diagonal);
+
+                  // Transition links to their new position.
+                  link.transition()
+                      .duration(duration)
+                      .attr("d", diagonal);
+
+                  // Transition exiting nodes to the parent's new position.
+                  link.exit().transition()
+                      .duration(duration)
+                      .attr("d", function(d) {
+                        var o = {x: source.x, y: source.y};
+                        return diagonal({source: o, target: o});
+                      })
+                      .remove();
+
+                  // Stash the old positions for transition.
+                  nodes.forEach(function(d) {
+                    d.x0 = d.x;
+                    d.y0 = d.y;
+                  });
+                }
+                // Toggle children on click.
+                function click(d) {
+                  if (d.children) {
+                    d._children = d.children;
+                    d.children = null;
+                  } else {
+                    d.children = d._children;
+                    d._children = null;
+                  }
+                  update(d);
+                }
+                function color(d) {
+                  return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+                }
+    }
     function generateIPLayerOfButtons()
     {
         $(".btn-groupIPS").empty();
@@ -211,6 +341,8 @@ function DrawVisualization() {
             }
             $(".btn-groupHours").append($something);
         }
+        $("#backbutton").show();
+        $("#forwardbutton").show;
         $(".btn-groupHours .btn").on("click", function (e) {
             _selectedHour = $(this).val();
             e.preventDefault();
@@ -270,26 +402,58 @@ function DrawVisualization() {
     };
 
     function drawTable(name) {
-        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
+        var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
         if ($('#table_div' + ' .' + name).length == 0) {
             var $tcp = $('<div/>').attr({class: name, type: 'div'});
+            //var $tcp = $('<table/>').attr({class: name + " display table table-striped table-bordered table-hover td-limit", type: 'table'});
+            //$tcp.attr('style','width: 650px');
+            //$tcp.style("width","650px");
             $('#table_div').append($tcp);
             $("<h4>" + (name) + ":</h4>").insertBefore('#table_div' + ' .' + name);
         }
+       /* $('#table_div' + ' .' + name).css("width","60px");
+
+       var data = [];
+        for (var port in dict) {
+            data.push([port,Object.keys(dict[port]).length,Object.keys(dict[port]).join(', ')]);
+        }
+       if(_datatables[name] != null || _datatables[name] != undefined) {
+            _datatables[name].clear().draw();
+            _datatables[name].rows.add(data); // Add new data
+            _datatables[name].columns.adjust().draw(); // Redraw the DataTable
+       }
+        else {
+            _datatables[name] = $('#table_div' + ' .' + name).DataTable({
+                data: data,
+                scrollX: true,
+                columns: [
+                    {title: "Port"},
+                    {title: "Total Number"},
+                    {title: "IPs"},
+
+                ],
+                autoWidth: false, //step 1
+               columnDefs: [
+                  { width: '10px', targets: 0 }, //step 2, column 1 out of 4
+                  { width: '10px', targets: 1 }, //step 2, column 2 out of 4
+               ]
+                //fixedColumns: true
+            });
+        }
+*/
+
         var small = [
             ['Port','Total Number', 'IPs'],
         ];
-
-        for (var port in dict) {
+       for (var port in dict) {
             small.push([port,Object.keys(dict[port]).length,Object.keys(dict[port]).join(', ')]);
         }
-
         var data = google.visualization.arrayToDataTable(small);
 
         var options = {
             page: true,
             pageSize: 10,
-        }
+        };
         var parent = document.getElementById("table_div");
         var child = parent.getElementsByClassName(name)[0];
 
@@ -297,20 +461,64 @@ function DrawVisualization() {
         table.draw(data, options);
 
     }
+    function drawDataTable(name){
+        var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
+        if ($('#notanweredconnections_div' + ' .' + name).length == 0) {
+            var $tcp = $('<table/>').attr({class: name + " display table table-striped table-bordered table-hover", type: 'table'});
+            $('#notanweredconnections_div').append($tcp);
+            $("<h4>" + (name) + ":</h4>").insertBefore('#notanweredconnections_div' + ' .' + name);
+        }
 
-        function drawSumaryTable() {
-        dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]["hoursummary"];
-        var array = [
+        var data = [];
+        for (var x in dict) {
+            data.push([x, dict[x]]);
+        }
+       if(_datatables[name] != null || _datatables[name] != undefined) {
+            _datatables[name].clear().draw();
+            _datatables[name].rows.add(data); // Add new data
+            _datatables[name].columns.adjust().draw(); // Redraw the DataTable
+       }
+        else {
+            _datatables[name] = $('#notanweredconnections_div' + ' .' + name).DataTable({
+                data: data,
+                //scrollX: true,
+                columns: [
+                    {title: "Attempted connection"},
+                    {title: "Number of tries"},
+                    ],
+            });
+        }
+
+    }
+    function drawSumaryTable() {
+        var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]["hoursummary"];
+        /*var array = [
             ['Feature', 'Value'],
-        ];
+        ];*/
+        var array = [];
         for (var feature in dict) {
             array.push([feature, dict[feature]]);
         }
-        var data = google.visualization.arrayToDataTable(array);
+        if(_datatables["hoursummary"] != null || _datatables["hoursummary"] != undefined) {
+                _datatables["hoursummary"].clear().draw();
+                _datatables["hoursummary"].rows.add(array); // Add new data
+                _datatables["hoursummary"].columns.adjust().draw(); // Redraw the DataTable
+            }
+        else {
+            _datatables["hoursummary"] = $('#sumary_table').DataTable({
+                data: array,
+                columns: [
+                    {title: "Feature"},
+                    {title: "Value"},
+                ]
+            });
+        }
+
+        /*var data = google.visualization.arrayToDataTable(array);
         var options = {};
         var div = document.getElementById("sumary_table");
         var table = new google.visualization.Table(div);
-        table.draw(data, options);
+        table.draw(data, options);*/
 
     }
 

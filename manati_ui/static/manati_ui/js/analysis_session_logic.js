@@ -420,6 +420,58 @@ function AnalysisSessionLogic(){
 
         });
     };
+    thiz.parseMD = function(data){
+        console.log(data);
+        if (typeof _analysis_session_id !== 'undefined') {
+            if(_analysis_session_type_file != "argus_netflow") {
+                var data = {
+                    'analysis_session_id': _analysis_session_id,
+                    'data': data
+                };
+
+                try{
+
+            $.ajax({
+                type:"POST",
+                data: data,
+                dataType: "json",
+                url: "/manati_project/manati_ui/analysis_session/create",
+                // handle a successful response
+                success : function(json) {
+                    alert("Succes")
+                },
+
+                // handle a non-successful response
+                error : function(xhr,errmsg,err) {
+                    $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+                        " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                    console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                    $('#save-table').attr('disabled',false).removeClass('disabled');
+                    $('#public-btn').hide();
+                    $.notify(xhr.status + ": " + xhr.responseText, "error");
+                    //NOTIFY A ERROR
+                    _m.EventAnalysisSessionSavingError(_filename);
+                    hideLoading();
+                }
+            });
+        }catch(e){
+            // thiz.destroyLoading();
+            $.notify(e, "error");
+            $('#public-btn').hide();
+            $('#save-table').attr('disabled',false).removeClass('disabled');
+        }
+
+
+
+
+
+            }
+            alert("Wrong typefile for creating profiles");
+        }
+        else {
+            alert('No binetflows loaded yet');
+        }
+    };
     function get_headers_info(){
         // _data_headers
         var column_visibles = _dt.columns().visible();

@@ -44,6 +44,20 @@
    padding-top: 56.6%;
 
 }*/
+/*.td-limit {
+    width: 70px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    word-wrap: break-word
+}
+*/
+/*.td {
+    max-width: 70px;
+    word-wrap: break-word
+}*/
+
+
 
 .checkbox label:after,
 .radio label:after {

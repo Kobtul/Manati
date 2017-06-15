@@ -25,4 +25,6 @@ urlpatterns = [
     url(r'^external_modules', views.IndexExternalModules.as_view(), name='index_external_modules'),
     url(r'^analysis_session/(?P<id>[0-9]+)/publish', views.publish_analysis_session, name='publish_analysis_session'),
     url(r'^profile_view', views.new_profile_session_view, name='profile'),
+    url(r'^profile_view/create', views.create_profile, name='create_profile'),
+
 ]

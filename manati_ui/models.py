@@ -23,8 +23,7 @@ import whois
 from share_modules.virustotal import *
 from share_modules.util import get_domain_by_obj
 vt = vt()
-
-
+from parsedata import dataGather
 
 # from django.db.models.signals import post_save
 # from django.dispatch import receiver
@@ -92,7 +91,6 @@ class AnalysisSessionManager(models.Manager):
                     hash_attr.pop("register_status", None)
                     hash_attr.pop('verdict', None)
                     hash_attr.pop('dt_id', None)
-
                     wb = Weblog.objects.create(analysis_session_id=analysis_session.id,
                                                register_status=RegisterStatus.READY,
                                                id=dt_id,
@@ -101,13 +99,16 @@ class AnalysisSessionManager(models.Manager):
                                                mod_attributes=json.dumps({}))
                     wb.clean()
                     wb_list.append(wb)
-
+            if (type_file == 'argus_netflow'):
+                analysis_session.run_profile()
+            #self.run_profile()
             return analysis_session
         except Exception as e:
             print_exception()
             return None
-
-
+#    @transaction.atomic
+#    def run_profile(self):
+#        pass
     @transaction.atomic
     def add_weblogs(self,analysis_session_id,key_list, data):
         try:
@@ -243,6 +244,17 @@ class AnalysisSession(TimeStampedModel):
             ("create_analysis_session", "Can create an analysis session"),
             ("update_analysis_session", "Can update an analysis session"),
         )
+    @transaction.atomic()
+    def run_profile(self):
+        weblogs = self.weblog_set.all()
+        result = dataGather.generate_profile_from_weblogs(weblogs)
+        with transaction.atomic():
+            for ip in result:
+                pr = Profile(ip=ip)
+                pr.analysissession = self
+                pr.data = result[ip]
+                pr.save()
+
 
 
 class AnalysisSessionUsers(TimeStampedModel):
@@ -252,7 +264,6 @@ class AnalysisSessionUsers(TimeStampedModel):
 
     class Meta:
         db_table = 'manati_analysis_sessions_users'
-
 
 class Weblog(TimeStampedModel):
     id = models.CharField(primary_key=True, null=False, max_length=15)
@@ -446,7 +457,23 @@ class Weblog(TimeStampedModel):
     def remove_all_aux_weblog(self):
         self.moduleauxweblog_set.clear()
 
+class Profile(TimeStampedModel):
+    ip = models.CharField(null=False, max_length=40)
+    analysissession = models.ForeignKey(AnalysisSession)
+    data = JSONField(default=json.dumps({}), null=False)
+    class Meta:
+        db_table = 'manati_weblog_profiles'
 
+    @property
+    def data_obj(self):
+        attr = self.data
+        if attr:
+            if type(attr) == dict:
+                return attr
+            else:
+                return json.loads(attr)
+        else:
+            return json.loads({})
 class WeblogHistory(TimeStampedModel):
     version = models.IntegerField(editable=False, default=0)
     weblog = models.ForeignKey(Weblog, on_delete=models.CASCADE, null=False, related_name='histories')

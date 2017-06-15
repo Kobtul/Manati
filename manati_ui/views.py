@@ -19,7 +19,6 @@ from preserialize.serialize import serialize
 from django.db.models import Q
 import logging
 
-
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
@@ -242,6 +241,21 @@ def convert(data):
         return type(data)(map(convert, data))
     else:
         return data
+
+@csrf_exempt
+def create_profile(request):
+    try:
+        if request.method == 'POST':
+            pass
+        else:
+            messages.error(request, 'Only POST request')
+            return HttpResponseServerError("Only POST request")
+    except Exception as e:
+        error = print_exception()
+        logger.error(str(error))
+        logger.error(str(e.message))
+        return HttpResponseServerError("ERROR in the server: " + str(e.message) + "\n:" + error)
+
 
 # @login_required(login_url=REDIRECT_TO_LOGIN)
 @csrf_exempt

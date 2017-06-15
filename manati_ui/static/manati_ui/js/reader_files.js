@@ -54,8 +54,24 @@ function ReaderFile(analysis_session_logic_obj){
               if (label == 'json')
               {
                   JsonObj = JSON.parse(evt.target.result);
-                  console.log(JsonObj);
+                  //console.log(JsonObj);
                   _aslo.showJson(JsonObj)
+              }
+              else if(label == 'md')
+              {
+                  var result = [];
+                  var ip = "";
+                  var rows = evt.target.result.split('\n');
+                  var i = 0;
+                  for (; i < rows.length; i++) {
+                      ip = rows[i].split(':')[0];
+                      if(ip != "") {
+                          result.push(ip);
+                          //console.log(rows[i]);
+                      }
+                  }
+
+                  _aslo.parseMD(result);
               }
               else {
                   var rows = evt.target.result.split('\n');
@@ -75,7 +91,6 @@ function ReaderFile(analysis_session_logic_obj){
 
                   } else if (label == 'binetflows') {
                       _aslo.setAnalysisSessionTypeFile('argus_netflow');
-                      $.notify("BINETTTTTTTT", "info")
                   }
                   else {
                       _aslo.setAnalysisSessionTypeFile('cisco_file');
