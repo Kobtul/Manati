@@ -11,8 +11,10 @@ var _datatables = {};
 
 function DrawVisualization() {
 
-    google.charts.load('current', {'packages':['geochart','corechart','table','bar']});
-    google.charts.setOnLoadCallback(redrawVisualization());
+    if(typeof google !== 'undefined') {
+        google.charts.load('current', {'packages': ['geochart', 'corechart', 'table', 'bar']});
+        google.charts.setOnLoadCallback(redrawVisualization());
+    }
     function regioMap() {
         $(window).on('drawmap', function (e) {
             console.log('Google charts loaded'/*, e.countriesDict*/);
@@ -20,6 +22,10 @@ function DrawVisualization() {
             //Concurrent.Thread.create(drawRegioMap);
         });
     }
+
+
+
+
     function redrawVisualization() {
         //if(_selectedIP) {
     /*    if (typeof _selectedIP !== 'undefined') {
@@ -342,7 +348,7 @@ function DrawVisualization() {
             $(".btn-groupHours").append($something);
         }
         $("#backbutton").show();
-        $("#forwardbutton").show;
+        $("#forwardbutton").show();
         $(".btn-groupHours .btn").on("click", function (e) {
             _selectedHour = $(this).val();
             e.preventDefault();

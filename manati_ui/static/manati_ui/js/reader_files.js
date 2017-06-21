@@ -48,8 +48,9 @@ function ReaderFile(analysis_session_logic_obj){
     }
     function handleFileSelect(evt) {
         reader = new FileReader();
+        var loadform = this.id;
         reader.onloadend = function(evt) {
-            console.log(label)
+          console.log(label);
           if (evt.target.readyState == FileReader.DONE) {
               if (label == 'json')
               {
@@ -57,7 +58,7 @@ function ReaderFile(analysis_session_logic_obj){
                   //console.log(JsonObj);
                   _aslo.showJson(JsonObj)
               }
-              else if(label == 'md')
+              else if(loadform == 'load_computersmd' && label == 'md')
               {
                   var result = [];
                   var ip = "";
@@ -70,7 +71,6 @@ function ReaderFile(analysis_session_logic_obj){
                           //console.log(rows[i]);
                       }
                   }
-
                   _aslo.parseMD(result);
               }
               else {
@@ -111,7 +111,7 @@ function ReaderFile(analysis_session_logic_obj){
     }
     var funcOnReady = function (){
         // _progress = document.querySelector('.percent');
-        $(document).on('change','#visualize_weblogs,#visualize_profile',handleFileSelect);
+        $(document).on('change','#visualize_weblogs,#visualize_profile,#load_computersmd' ,handleFileSelect);
         // document.getElementById('visualize_weblogs').addEventListener('change', handleFileSelect, false);
         $(':file').on('fileselect', function(event, numFiles, label) {
               var input = $(this).parents('.input-group').find(':text'),

@@ -243,10 +243,39 @@ def convert(data):
         return data
 
 @csrf_exempt
+def get_profile(request):
+    try:
+        if request.method == 'POST':
+            user = request.user
+            received_json_data = json.loads(request.body)
+            analysis_session_id = received_json_data['analysis_session_id']
+            if user.is_authenticated():
+                result = {}
+                for profile in Profile.objects.filter(analysissession=analysis_session_id):
+                    result[profile.ip] = profile.data
+                #return JsonResponse(dict(data=json.dumps(result),msg='Getting Weblogs Whois-Related DONE'))
+                return JsonResponse(result)
+
+        else:
+            messages.error(request, 'Only GET request')
+            return HttpResponseServerError("Only GET request")
+    except Exception as e:
+        error = print_exception()
+        logger.error(str(error))
+        logger.error(str(e.message))
+        return HttpResponseServerError("ERROR in the server: " + str(e.message) + "\n:" + error)
+
+@csrf_exempt
 def create_profile(request):
     try:
         if request.method == 'POST':
-            pass
+            user = request.user
+            received_json_data = json.loads(request.body)
+            analysis_session_id = received_json_data['analysis_session_id']
+            ips = received_json_data['data']
+            analysisobject = AnalysisSession.objects.filter(id=analysis_session_id).first()
+            analysisobject.run_profile(ips)
+            return HttpResponse(status=204)
         else:
             messages.error(request, 'Only POST request')
             return HttpResponseServerError("Only POST request")
@@ -255,7 +284,6 @@ def create_profile(request):
         logger.error(str(error))
         logger.error(str(e.message))
         return HttpResponseServerError("ERROR in the server: " + str(e.message) + "\n:" + error)
-
 
 # @login_required(login_url=REDIRECT_TO_LOGIN)
 @csrf_exempt

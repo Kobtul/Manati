@@ -100,7 +100,8 @@ class AnalysisSessionManager(models.Manager):
                     wb.clean()
                     wb_list.append(wb)
             if (type_file == 'argus_netflow'):
-                analysis_session.run_profile()
+                pass
+                #analysis_session.run_profile()
             #self.run_profile()
             return analysis_session
         except Exception as e:
@@ -245,9 +246,9 @@ class AnalysisSession(TimeStampedModel):
             ("update_analysis_session", "Can update an analysis session"),
         )
     @transaction.atomic()
-    def run_profile(self):
+    def run_profile(self,ips):
         weblogs = self.weblog_set.all()
-        result = dataGather.generate_profile_from_weblogs(weblogs)
+        result = dataGather.generate_profile_from_weblogs(weblogs,ips)
         with transaction.atomic():
             for ip in result:
                 pr = Profile(ip=ip)

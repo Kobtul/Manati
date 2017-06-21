@@ -31,6 +31,7 @@ def load_computers_to_analyze_from_file():
     for line in file:
         ip = line.split (':')[0]
         ips.add(ip)
+    return ips
 
 def intializeComputersToAnalyze(ips):
     for ip in ips:
@@ -375,25 +376,32 @@ def signal_handler(signal, frame):
         print('Exiting now!')
     sys.exit(0)
 
-def generate_profile_from_weblogs(weblogs):
-    ips = set()
-    ips.add('147.32.86.78')
+def generate_profile_from_weblogs(weblogs,ips):
+    load_whois_cache_from_file()
     intializeComputersToAnalyze(ips)
     lastHourID = ""
     for weblog in weblogs:
         lineDict = weblog.attributes
         lastHourID = processLine(lineDict, lastHourID)
     fillFeaturesClassFromTempClass(lastHourID)
+    if SAVECACHE:
+        save_whois_cache_to_file()
     return result
 
-if __name__ == "__main__":
-    signal.signal (signal.SIGINT, signal_handler)
-    try:
-        with open ('whoiscahce.json') as data_file:
-            whoiscache.whois_cache = json.load (data_file)
-    except IOError:
-        print('radpcahce not found')
+def save_whois_cache_to_file():
+    with open('whoiscahce.json', 'w') as fp:
+        json.dump(whoiscache.get_whois_cache(), fp, default=dumper, indent=2)
 
+def load_whois_cache_from_file():
+    try:
+        with open('whoiscahce.json') as data_file:
+            whoiscache.whois_cache = json.load(data_file)
+    except IOError:
+        print('whoiscahce not found')
+if __name__ == "__main__":
+    #TODO Add option to load whois data on the background to speed the creation of the profile
+    #TODO Add branch for devel
+    signal.signal (signal.SIGINT, signal_handler)
     try:
         with open ('country_cache.json') as data_file:
             whoiscache.whois_country_cache = json.load (data_file)
@@ -415,8 +423,7 @@ if __name__ == "__main__":
     with open ('result.json', 'w') as fp:
         json.dump (result, fp, default=dumper)
     if SAVECACHE:
-        with open ('whoiscahce.json', 'w') as fp:
-            json.dump (whoiscache.get_whois_cache (), fp, default=dumper, indent=2)
+        save_whois_cache_to_file()
         with open ('country_cache.json', 'w') as fp:
             json.dump (whoiscache.get_country_cache (), fp, default=dumper, indent=2)
     print('done')
