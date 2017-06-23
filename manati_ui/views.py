@@ -428,6 +428,16 @@ class EditAnalysisSession(generic.DetailView):
         context['comment'] = object.comments.last() if object.comments.exists() else Comment()
         return context
 
+@csrf_exempt
+def render_edit_analysis_session(request,analysis_session_id):
+    context = {"analysis_session_id": analysis_session_id}
+    analysis_session = AnalysisSession.objects.get(id=analysis_session_id)
+
+    if(analysis_session.type_file == 'argus_netflow'):
+        return render(request, 'manati_ui/profile/edit.html', context)
+    else:
+        return render(request, 'manati_ui/analysis_session/edit.html', context)
+
 
 @login_required(login_url=REDIRECT_TO_LOGIN)
 @csrf_exempt

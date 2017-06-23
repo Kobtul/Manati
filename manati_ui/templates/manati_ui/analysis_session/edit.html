@@ -2,7 +2,7 @@
 {% block title %}
     <div class="row">
         <div class="col-md-10">
-                Analysis Session - {{ analysissession.name }}
+                Analysis Session gthhynj- {{ analysissession.name }}
     <a id="sync-db-btn" href="#" class="btn btn-success"><i class="fa fa-refresh" aria-hidden="true"></i> Sync</a>
     {% load staticfiles %}
     <img id="loading-img" width="33" src="{% static 'manati_ui/images/ajax-loader.gif' %}"/>
@@ -71,7 +71,8 @@
         VERSION_APP = '{% version_app %}';
         var logic = new AnalysisSessionLogic();
         logic.init();
-        logic.callingEditingData({{analysissession.id| safe}});
+        //logic.callingEditingData({{analysissession.id| safe}});
+        logic.callingEditingData({{analysis_session_id| safe}});
 
 
     </script>

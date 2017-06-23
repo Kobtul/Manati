@@ -1,0 +1,99 @@
+{% extends 'manati_ui/base.html' %}
+{% block title %}
+    <div class="row">
+        <div class="col-md-10">
+
+            New Profile Session - <span id="weblogfile-name"></span><input type="text" maxlength="60" id="edit-input" />
+            <a id="sync-db-btn" style="display: none;" href="#" class="btn btn-success"><i class="fa fa-refresh" aria-hidden="true"></i> Sync</a>
+            {% load staticfiles %}
+            <img id="loading-img" width="33" style="display: none;" src="{% static 'manati_ui/images/ajax-loader.gif' %}"/>
+        </div>
+    </div>
+{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <input type="button" id="backbutton"    class="backbutton btn" style="display: none;">
+        <input type="button" id="forwardbutton" class="forwardbutton btn" style="display: none;">
+        <div class="col-md-12">
+            <div id="viztext" style="display: none;">
+                <h2>Visualization</h2>
+            </div>
+            <div class="btn-groupIPS" role="group" aria-label="..." style="display: none;">
+            </div>
+            <div class="btn-groupDays" role="group" aria-label="..." style="display: none;">
+            </div>
+
+            <div id="ipsumarytext" style="display: none;">
+                <h3>IP Sumary</h3>
+            </div>
+            <div class="btn-groupHours" role="group" aria-label="..." style="display: none;">
+            </div>
+             <ul class="nav nav-tabs" id="featurestabs" style="visibility: hidden">
+                 <li class="active"><a data-toggle="tab" href="#sumary_tab">Hour Sumary</a></li>
+                 <li><a data-toggle="tab" href="#regions_tab">Regions</a></li>
+                 <li><a data-toggle="tab" href="#donutchart_tab">Class B networks</a></li>
+
+                 <li><a data-toggle="tab" href="#histograms_tab">Port features</a></li>
+                 <li><a data-toggle="tab" href="#tables_tab">IPs for ports</a></li>
+                 <li><a data-toggle="tab" href="#notanweredconnections_tab">Not answered connections</a></li>
+
+                 <li><a data-toggle="tab" href="#json_tab">JSON</a></li>
+
+                 <li><a data-toggle="tab" href="#testing_tab">Testing</a></li>
+
+             </ul>
+             <div class="tab-content">
+                 <div id="sumary_tab" class="tab-pane active">
+                     <!-- div for the Google charts -->
+                     <!--<div id="sumary_table"></div>-->
+                     <table id="sumary_table" class="display table table-striped table-bordered table-hover"></table>
+
+                 </div>
+                 <div id="regions_tab" class="tab-pane">
+                     <div id="regions_div"></div>
+                 </div>
+                 <div id="donutchart_tab" class="tab-pane">
+                     <div id="donutchart_div"></div>
+                 </div>
+                 <div id="histograms_tab" class="tab-pane">
+                     <div class="checkbox text-center">
+                        <label style="font-size: 1.5em">
+                            <input id="logcheckbox" type="checkbox" value="">
+                            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                            Use logarithm scale. Better for visibility of small values.
+                        </label>
+                    </div>
+                     <div id="histograms_div"></div>
+                  </div>
+                 <div id="tables_tab" class="tab-pane">
+                    <div id="table_div"></div>
+                 </div>
+                 <div id="json_tab" class="tab-pane">
+                       <div id='jsonviz'></div>
+                 </div>
+                 <div id="notanweredconnections_tab" class="tab-pane">
+                     <div id="notanweredconnections_div"></div>
+                     <!--<table id="table_id" class="display table table-striped table-bordered table-hover"></table>-->
+                 </div>
+                 <div id="testing_tab" class="tab-pane">
+
+                 </div>
+             </div>
+        </div>
+    </div>
+    {% include 'manati_ui/analysis_session/modal_vt.html' %}
+    <style>
+    #weblogfile-name:hover{
+        cursor: pointer;
+
+    }
+    </style>
+    <script type="text/javascript">
+        VERSION_APP = '{% version_app %}';
+        var logic = new AnalysisSessionLogic();
+        logic.init();
+        logic.callingEditingProfile({{analysis_session_id| safe}});
+
+    </script>
+{% endblock %}

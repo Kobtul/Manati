@@ -170,6 +170,7 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
         addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfNonAnsweredConnections', ipTarget, 1)
         #TODO Ask sebas if not answered connections should be in the histograms
         fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict)
+        #TODO Check log of not used lines that should be catched by this
 
 
         # ipFeaturesTemp['clientDictOfNonAnsweredConnections'].add (ipTo)
@@ -272,7 +273,7 @@ def detectConnectionAttemptWithNoAnswer(connectionInformation):
     connectionInformationTo = connectionInformation.split ('_')[1]
     if (connectionInformationFrom == 'S' and connectionInformationTo == ''):  # Absolutely no answer
         return True
-    if (connectionInformationFrom == 'S' and 'R' in connectionInformationTo and 'A' in connectionInformationTo):  # Reset Acknowledged
+    if ('S' in connectionInformationFrom and 'R' in connectionInformationTo and 'A' in connectionInformationTo):  # Reset Acknowledged
         return True
     return False
 

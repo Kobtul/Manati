@@ -1184,30 +1184,32 @@ function AnalysisSessionLogic(){
                     }
                 })
             });
-            $('#get-raw-json').on('click',function (e){
-                var data = {'analysis_session_id': _analysis_session_id};
-                $.ajax({
-                   type:'POST',
-                   data: JSON.stringify(data),
-                   url: "/manati_project/manati_ui/analysis_session/get_profile",
-
-                  // url: "/manati_project/manati_ui/analysis_session/sync_db",
-                   dataType: 'json',
-                   success: function(data) {
-                        console.log('success',data);
-                        thiz.showJson(data)
-                   },
-                   error:function(exception){
-                       //alert('Exeption:'+exception);
-                       console.log(exception.toString())
-                   }
-                });
+            $('#get-raw-json').on('click',function (e) {
+                getProfileFromServer(_analysis_session_id);
                 e.preventDefault();
             });
 
         });
     };
+    var getProfileFromServer = function (analysis_session_id) {
+        var data = {'analysis_session_id': analysis_session_id};
+        $.ajax({
+           type:'POST',
+           data: JSON.stringify(data),
+           url: "/manati_project/manati_ui/analysis_session/get_profile",
 
+          // url: "/manati_project/manati_ui/analysis_session/sync_db",
+           dataType: 'json',
+           success: function(data) {
+                //console.log('success',data);
+                thiz.showJson(data)
+           },
+           error:function(exception){
+               //alert('Exeption:'+exception);
+               console.log(exception.toString())
+           }
+        });
+    };
 
     /************************************************************
                             PUBLIC FUNCTIONS
@@ -1377,6 +1379,10 @@ function AnalysisSessionLogic(){
             });
 
     };
+    this.callingEditingProfile = function (analysis_session_id){
+        getProfileFromServer(analysis_session_id);
+    };
+
 
     var setBulkVerdict_WORKER = function (verdict, flows_labelled){
         _dt.rows('.selected').nodes().to$().removeClass('selected');
