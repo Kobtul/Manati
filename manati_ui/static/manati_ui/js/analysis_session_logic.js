@@ -1206,7 +1206,13 @@ function AnalysisSessionLogic(){
            dataType: 'json',
            success: function(data) {
                 //console.log('success',data);
-                thiz.showJson(data)
+                 if (Object.keys(data).length === 0)
+                 {
+                     $('#wrap-form-upload-computersmd').show();
+                 }
+                 else {
+                     thiz.showJson(data)
+                 }
            },
            error:function(exception){
                //alert('Exeption:'+exception);
@@ -1271,7 +1277,15 @@ function AnalysisSessionLogic(){
                     });
 
                     initData(data,headers);
-                    $.notify("File loaded succesfully, saving to the database", "info");
+                    $.notify("File loaded succesfully", "info");
+                    if(_analysis_session_type_file == "argus_netflow") {
+                        $.notify("Saving to the database", {
+                            className: 'info',
+                            clickToHide: true,
+                            autoHide: true,
+                            globalPosition: 'top right'
+                        });
+                    }
                     //hideLoading();
                     _m.EventFileUploadingFinished(_filename, rowCount);
 
@@ -1385,6 +1399,8 @@ function AnalysisSessionLogic(){
 
     };
     this.callingEditingProfile = function (analysis_session_id){
+        //TODO look if _m.events are neccesary for this
+        _analysis_session_id = analysis_session_id;
         getProfileFromServer(analysis_session_id);
     };
 
