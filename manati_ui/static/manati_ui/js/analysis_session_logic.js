@@ -423,8 +423,8 @@ function AnalysisSessionLogic(){
 
 
     thiz.parseMD = function (data) {
-        console.log(data);
-        hideLoading();
+        //console.log(data);
+       // hideLoading();
         _m.EventFileUploadingFinished(_filename);
         if (_analysis_session_id != -1) {
             var data = {
@@ -440,6 +440,10 @@ function AnalysisSessionLogic(){
                     // handle a successful response
                     success: function (json) {
                         $.notify("Profile created successfully", "info"/*, {autoHideDelay: 5000 }*/);
+                        getProfileFromServer(_analysis_session_id);
+                        $('#wrap-form-upload-computersmd').hide();
+                        hideLoading();
+
                     },
 
                     // handle a non-successful response
@@ -502,6 +506,7 @@ function AnalysisSessionLogic(){
 
                     _m.EventAnalysisSessionSavingFinished(_filename,_analysis_session_id);
                     $.notify("All Weblogs ("+json['data_length']+ ") were created successfully ", 'success');
+                    hideLoading();
                     if(_analysis_session_type_file != "argus_netflow") {
                         _dt.column(COLUMN_REG_STATUS, {search: 'applied'}).nodes().each(function (cell, i) {
                             var tr = $(cell).closest('tr');
@@ -514,7 +519,6 @@ function AnalysisSessionLogic(){
                             "Edit AnalysisSession " + _analysis_session_id,
                             "/manati_project/manati_ui/analysis_session/" + _analysis_session_id + "/edit");
                         _sync_db_interval = setInterval(syncDB, TIME_SYNC_DB);
-                        hideLoading();
                         columns_order_changed = false;
                         $("#weblogfile-name").off('click');
                         $("#weblogfile-name").css('cursor', 'auto');
@@ -1267,7 +1271,8 @@ function AnalysisSessionLogic(){
                     });
 
                     initData(data,headers);
-                    hideLoading();
+                    $.notify("File loaded succesfully, saving to the database", "info");
+                    //hideLoading();
                     _m.EventFileUploadingFinished(_filename, rowCount);
 
                 }

@@ -15,8 +15,8 @@ from WhoisCache import RadpCache
 import copy
 
 
-SAVECACHE = True
-USEWHOISDATA = True
+SAVECACHE = False
+USEWHOISDATA = False
 
 timeIDSInCapture = []
 result = {}
