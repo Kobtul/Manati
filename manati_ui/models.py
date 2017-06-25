@@ -248,6 +248,7 @@ class AnalysisSession(TimeStampedModel):
     @transaction.atomic()
     def run_profile(self,ips):
         weblogs = self.weblog_set.all()
+
         result = dataGather.generate_profile_from_weblogs(weblogs,ips)
         with transaction.atomic():
             for ip in result:

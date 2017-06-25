@@ -313,12 +313,30 @@ function DrawVisualization() {
         }
         if(typeof _selectedHour !== 'undefined')
         {
+            if (Object.keys(_jsonprofile[_selectedIP]["time"][_selectedDate]).length > 1) {
+                var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]["hoursummary"];
+                for (var feature in dict) {
+                    drawDailyGraph(feature);
+                }
+            }
             generateHourLayerOfButtons();
         }
         $(".btn-groupDays .btn").on("click", function (e) {
             _selectedDate = $(this).val();
             e.preventDefault();
             $(this).addClass('btn-info').siblings().removeClass('btn-info');
+            if (Object.keys(_jsonprofile[_selectedIP]["time"][_selectedDate]).length > 1) {
+                var dict = _jsonprofile[_selectedIP]["time"][_selectedDate];
+                var randomhour;
+                for (var hour in dict) {
+                    randomhour = hour;
+                    break;
+                }
+                var dict_2 = _jsonprofile[_selectedIP]["time"][_selectedDate][randomhour]["hoursummary"];
+                for (var feature in dict_2) {
+                    drawDailyGraph(feature);
+                }
+            }
             generateHourLayerOfButtons();
         });
     }
@@ -466,6 +484,32 @@ function DrawVisualization() {
         var table = new google.visualization.Table(child);
         table.draw(data, options);
 
+    }
+    function drawDailyGraph(name)
+    {
+        var dict = _jsonprofile[_selectedIP]["time"][_selectedDate];//[_selectedHour][name];
+        var dictofonefeature = {};
+        if ($('#day_graphs_div' + ' .' + name).length == 0) {
+            var $tcp = $('<div/>').attr({class: name, type: 'div'});
+            $('#day_graphs_div').append($tcp);
+            $("<h4>" + (name) + ":</h4>").insertBefore('#day_graphs_div' + ' .' + name);
+        }
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('string', 'hour');
+        dataTable.addColumn('number', 'value');
+        for (var hour in dict){
+            dataTable.addRow([hour, dict[hour]["hoursummary"][name]]);
+        }
+        var parent = document.getElementById("day_graphs_div");
+        var child = parent.getElementsByClassName(name)[0];
+        var options = {
+                        title: name,
+                        // legend: {position: 'top', maxLines: 2},
+                        legend: 'none',
+                        vAxis: {format: 'decimal'},
+                    };
+        var chart = new google.visualization.LineChart(child);
+        chart.draw(dataTable, google.charts.Bar.convertOptions(options));
     }
     function drawDataTable(name){
         var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];

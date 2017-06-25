@@ -257,8 +257,8 @@ def get_profile(request):
                 return JsonResponse(result)
 
         else:
-            messages.error(request, 'Only GET request')
-            return HttpResponseServerError("Only GET request")
+            messages.error(request, 'Only POST request')
+            return HttpResponseServerError("Only POST request")
     except Exception as e:
         error = print_exception()
         logger.error(str(error))
@@ -273,6 +273,7 @@ def create_profile(request):
             received_json_data = json.loads(request.body)
             analysis_session_id = received_json_data['analysis_session_id']
             ips = received_json_data['data']
+            #whois = WhoisConsult.objects.filter(user=user).first()  No guarantee that the line exists
             analysisobject = AnalysisSession.objects.filter(id=analysis_session_id).first()
             analysisobject.run_profile(ips)
             return HttpResponse(status=204)

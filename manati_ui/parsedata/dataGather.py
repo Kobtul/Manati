@@ -168,7 +168,7 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
         fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict)
     elif (detectConnectionAttemptWithNoAnswer (connectionInformationState)):
         addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfNonAnsweredConnections', ipTarget, 1)
-        #TODO Ask sebas if not answered connections should be in the histograms
+        #TODO Ask sebas if not answered connections should be in the histograms, make the two colors mode for this
         fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict)
         #TODO Check log of not used lines that should be catched by this
 
@@ -194,7 +194,7 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
         pass
     else:
         pass
-        print (lineDict)
+        print (convertDictToLine(lineDict))
 
     ipFeaturesTemp['hoursummary']['numberOfIPFlows'] = ipFeaturesTemp['hoursummary']['numberOfIPFlows'] + 1
 def unusedSnippedsOfCode():
@@ -227,7 +227,7 @@ def fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarg
         addPortDictIPSToDict (ipFeaturesTemp, portDictIPS + 'UDP', dstPort, ipTarget)
         addAllPortFeaturesToDict (ipFeaturesTemp, clientorserver, protocol, sourcePort, dstPort, totBytes, totalPakets)
     else:
-        print(lineDict)
+        print(convertDictToLine(lineDict))
 
 def addAllPortFeaturesToDict(ipFeaturesTemp,source,protocol,sourcePort,destinationPort,totalBytes,totalPackets):
     d = {'SourcePort':sourcePort , 'DestinationPort':destinationPort}
@@ -253,7 +253,7 @@ def addPortDictIPSToDict(ipFeaturesTemp, dictname, port, ip):
 
 def detectConnection(connectionInformation):
     # TODO : For the UDP
-    if (connectionInformation == 'CON'):
+    if (connectionInformation == 'CON' or connectionInformation == 'EST'): #CON and EST for TCP, CON for UDP
         return True
     # if (connectionInformation == 'URP'):    #ASK SEBAS FOR THIS, this is icmp protocol
     #    return True
@@ -267,11 +267,14 @@ def detectConnection(connectionInformation):
 
 
 def detectConnectionAttemptWithNoAnswer(connectionInformation):
+    if (connectionInformation == 'REQ' or connectionInformation == 'INT'): #for UDP
+        return True
     if (len (connectionInformation.split ('_')) != 2):
         return False
+    #for TCP
     connectionInformationFrom = connectionInformation.split ('_')[0]
     connectionInformationTo = connectionInformation.split ('_')[1]
-    if (connectionInformationFrom == 'S' and connectionInformationTo == ''):  # Absolutely no answer
+    if ('S' in connectionInformationFrom and connectionInformationTo == ''):  # Absolutely no answer
         return True
     if ('S' in connectionInformationFrom and 'R' in connectionInformationTo and 'A' in connectionInformationTo):  # Reset Acknowledged
         return True
@@ -378,6 +381,7 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 def generate_profile_from_weblogs(weblogs,ips):
+
     load_whois_cache_from_file()
     intializeComputersToAnalyze(ips)
     lastHourID = ""

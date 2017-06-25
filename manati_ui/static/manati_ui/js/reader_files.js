@@ -89,7 +89,7 @@ function ReaderFile(analysis_session_logic_obj){
                       _aslo.setAnalysisSessionTypeFile('bro_http_log');
                       rows.unshift(header);
 
-                  } else if (label == 'binetflows') {
+                  } else if (label == 'binetflows' || label == 'binetflow') {
                       _aslo.setAnalysisSessionTypeFile('argus_netflow');
                   }
                   else {

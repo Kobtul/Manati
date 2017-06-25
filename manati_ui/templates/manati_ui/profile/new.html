@@ -57,6 +57,13 @@
                         </div>
                     </div>
                     <!--<input type="button" id="get-raw-json" class="btn btn-primary" value="Show Profile from server" />-->
+                    <div class="checkbox text-center">
+                        <label style="font-size: 1.5em;color: #ccc">
+                            <input id="greyedoutcheckbox" type="checkbox" value="" disabled>
+                            <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                            Use Whois Data.
+                        </label>
+                    </div>
                     <div class="form-group">
                         <div id="loading-circle" style="margin-bottom: 39px"></div>
                     </div>
@@ -74,7 +81,7 @@
             </div>
             <div class="btn-groupDays" role="group" aria-label="..." style="display: none;">
             </div>
-
+            <div id="day_graphs_div"></div>
             <div id="ipsumarytext" style="display: none;">
                 <h3>IP Sumary</h3>
             </div>
