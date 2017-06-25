@@ -144,7 +144,7 @@ def processLine(lineDict, lastTimeID):
 #ipDict is ip where the features are added
 def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,sourcePort,dstPort,connectionInformationState,totalPakets,totBytes,srcBytes):
     ipFeaturesTemp = temp[ipDict]
-    ipFeaturesTemp['hoursummary'][clientorserver +'NumberOfIPFlows'] = ipFeaturesTemp['hoursummary'][clientorserver +'NumberOfIPFlows'] + 1
+    ipFeaturesTemp['hoursummary'][clientorserver]['NumberOfIPFlows'] = ipFeaturesTemp['hoursummary'][clientorserver +'NumberOfIPFlows'] + 1
     # ipFeaturesTemp['hoursummary']['numberOfIPFlows'] = ipFeaturesTemp['hoursummary']['numberOfIPFlows'] + 1
     # per flow consumer/producer ratio
     result[ipDict]['perflow']['consumerproducerratio'].add (srcBytes / totBytes)
@@ -163,8 +163,8 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
         # ipFeaturesTemp['clientDictClassBnetworks'].add (classB)
         addFeaturesToDict(ipFeaturesTemp, clientorserver +'DictClassBnetworks', classB, 1)
 
-        ipFeaturesTemp['hoursummary'][clientorserver +'TotalNumberOfTransferedData'] = ipFeaturesTemp['hoursummary'][
-                                                                        clientorserver +'TotalNumberOfTransferedData'] + totBytes
+        ipFeaturesTemp['hoursummary'][clientorserver]['TotalNumberOfTransferedData'] = ipFeaturesTemp['hoursummary'][
+                                                                        clientorserver]['TotalNumberOfTransferedData'] + totBytes
         fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict)
     elif (detectConnectionAttemptWithNoAnswer (connectionInformationState)):
         addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfNonAnsweredConnections', ipTarget, 1)

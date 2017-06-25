@@ -319,6 +319,7 @@ function DrawVisualization() {
                     drawDailyGraph(feature);
                 }
             }
+            $("#dayprofilecolapse").show();
             generateHourLayerOfButtons();
         }
         $(".btn-groupDays .btn").on("click", function (e) {
@@ -337,6 +338,7 @@ function DrawVisualization() {
                     drawDailyGraph(feature);
                 }
             }
+            $("#dayprofilecolapse").show();
             generateHourLayerOfButtons();
         });
     }
@@ -508,7 +510,14 @@ function DrawVisualization() {
                         legend: 'none',
                         vAxis: {format: 'decimal'},
                     };
+        //child.style.display = 'block';
+        $("#demo").addClass("in");
         var chart = new google.visualization.LineChart(child);
+        google.visualization.events.addListener(chart, 'ready', function () {
+            //child.style.display = 'none';
+            $("#demo").removeClass("in");
+
+        });
         chart.draw(dataTable, google.charts.Bar.convertOptions(options));
     }
     function drawDataTable(name){
