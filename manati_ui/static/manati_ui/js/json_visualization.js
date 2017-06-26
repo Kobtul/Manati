@@ -268,6 +268,8 @@ function DrawVisualization() {
     {
         $(".btn-groupIPS").empty();
         $(".btn-groupIPS").show();
+        $("#dayprofilecolapse").hide();
+
 
         $.each(_jsonprofile, function (k, v) {
             //display the key and value pair
@@ -318,8 +320,8 @@ function DrawVisualization() {
                 for (var feature in dict) {
                     drawDailyGraph(feature);
                 }
+                $("#dayprofilecolapse").show();
             }
-            $("#dayprofilecolapse").show();
             generateHourLayerOfButtons();
         }
         $(".btn-groupDays .btn").on("click", function (e) {
@@ -337,8 +339,8 @@ function DrawVisualization() {
                 for (var feature in dict_2) {
                     drawDailyGraph(feature);
                 }
+                $("#dayprofilecolapse").show();
             }
-            $("#dayprofilecolapse").show();
             generateHourLayerOfButtons();
         });
     }
@@ -385,7 +387,26 @@ function DrawVisualization() {
         $link.parent().removeClass('active');
         var tabLink = $link.attr('href');
         $('#featurestabs a[href="' + tabLink + '"]').tab('show');
+        $(".tab-content").css('visibility', 'visible');
+
     }
+    this.clearVisualization = function () {
+        $("#viztext").hide();
+        $(".btn-groupIPS").empty();
+        $(".btn-groupDays").empty();
+        $(".btn-groupHours").empty();
+        $("#backbutton").hide();
+        $("#forwardbutton").hide();
+        $("#dayprofilecolapse").hide();
+        $("#featurestabs .tab").empty();
+        $(".tab-content").css('visibility', 'hidden');
+        $("#featurestabs").css('visibility', 'hidden');
+
+        //TODO refing using of undefined https://stackoverflow.com/questions/2235622/can-i-set-variables-to-undefined-or-pass-undefined-as-an-argument
+        _selectedIP = undefined;
+        _selectedHour = undefined;
+        _selectedDate = undefined;
+    };
     this.showJSON = function (json) {
         _jsonprofile = json;
     /*$(document).ready(function() {
@@ -551,9 +572,10 @@ function DrawVisualization() {
     }
     function drawSumaryTable() {
         var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]["hoursummary"];
-        /*var array = [
-            ['Feature', 'Value'],
-        ];*/
+        if (!$('#sumary_table').is()) {
+            var $tcp = $('<table/>').attr({class: "display table table-striped table-bordered table-hover", type: 'table'});
+            $('#sumary_tab').append($tcp);
+        }
         var array = [];
         for (var feature in dict) {
             array.push([feature, dict[feature]]);

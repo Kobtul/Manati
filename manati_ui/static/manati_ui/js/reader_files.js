@@ -54,6 +54,7 @@ function ReaderFile(analysis_session_logic_obj){
           if (evt.target.readyState == FileReader.DONE) {
               if (label == 'json')
               {
+                  _aslo.clearJson();
                   JsonObj = JSON.parse(evt.target.result);
                   //console.log(JsonObj);
                   _aslo.showJson(JsonObj)

@@ -1248,10 +1248,12 @@ function AnalysisSessionLogic(){
     };
 
 
-
+    thiz.clearJson = function(){
+      draw_viz.clearVisualization();
+    };
     thiz.showJson = function(json){
         hideLoading();
-        _m.EventFileUploadingFinished(_filename);
+       // _m.EventFileUploadingFinished(_filename);
         draw_viz.showJSON(json);
     };
 
@@ -1279,6 +1281,7 @@ function AnalysisSessionLogic(){
                     initData(data,headers);
                     $.notify("File loaded succesfully", "info");
                     if(_analysis_session_type_file == "argus_netflow") {
+                        thiz.clearJson();
                         $.notify("Saving to the database", {
                             className: 'info',
                             clickToHide: true,

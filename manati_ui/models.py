@@ -464,7 +464,7 @@ class Profile(TimeStampedModel):
     analysissession = models.ForeignKey(AnalysisSession)
     data = JSONField(default=json.dumps({}), null=False)
     class Meta:
-        db_table = 'manati_weblog_profiles'
+        db_table = 'manati_analysis_session_profiles'
 
     @property
     def data_obj(self):
