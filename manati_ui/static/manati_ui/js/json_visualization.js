@@ -409,6 +409,38 @@ function DrawVisualization() {
     };
     this.showJSON = function (json) {
         _jsonprofile = json;
+       // $("#save-profile").show(); // not sure if it is a bad practice to rely that this does not work when the element is not present
+        $("#save-profile").on("click", function () {
+            var data = {
+                'profile': _jsonprofile,
+                'filename' : 'bambule'
+            };
+            try {
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    url: "/manati_project/manati_ui/analysis_session/save_profile",
+                    // handle a successful response
+                    success: function (json) {
+                        $.notify("Profile saved successfully", "info"/*, {autoHideDelay: 5000 }*/);
+                        $("#save-profile").hide();
+                    },
+
+                    // handle a non-successful response
+                    error: function (xhr, errmsg, err) {
+                        $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: " + errmsg +
+                            " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+                        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+                        $.notify(xhr.status + ": " + xhr.responseText, "error");
+                        //NOTIFY A ERROR
+                        _m.EventAnalysisSessionSavingError(_filename);
+                    }
+                });
+            } catch (e) {
+                $.notify(e, "error");
+            }
+        });
     /*$(document).ready(function() {
         alert("Ready sir")
     });*/

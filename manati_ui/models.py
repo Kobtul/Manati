@@ -99,17 +99,35 @@ class AnalysisSessionManager(models.Manager):
                                                mod_attributes=json.dumps({}))
                     wb.clean()
                     wb_list.append(wb)
-            if (type_file == 'argus_netflow'):
-                pass
-                #analysis_session.run_profile()
-            #self.run_profile()
             return analysis_session
         except Exception as e:
             print_exception()
             return None
-#    @transaction.atomic
-#    def run_profile(self):
-#        pass
+    @transaction.atomic
+    def create_with_profile(self, filename,datajson, current_user):
+        try:
+            analysis_session = AnalysisSession(type_file='json_profile')
+            previous_exists = AnalysisSession.objects.filter(name=filename, users__id=current_user.id)
+            if previous_exists.count() > 0:
+                count = 1
+                while previous_exists.count() > 0:
+                    copy_filename = filename + " " + "(" + str(count) + ")"
+                    previous_exists = AnalysisSession.objects.filter(name=copy_filename, users__id=current_user.id)
+                    count += 1
+                filename = copy_filename
+            with transaction.atomic():
+                analysis_session.name = filename
+                analysis_session.clean()
+                analysis_session.save()
+                analysis_sessions_users = AnalysisSessionUsers.objects.create(analysis_session_id=analysis_session.id,
+                                                                              user_id=current_user.id)
+                for ip in datajson:
+                    pr = Profile.objects.create(analysissession=analysis_session,ip=ip,data=datajson[ip])
+                pr.clean()
+            return analysis_session
+        except Exception as e:
+            print_exception()
+            return None
     @transaction.atomic
     def add_weblogs(self,analysis_session_id,key_list, data):
         try:
@@ -207,10 +225,14 @@ class RegisterStatus(enum.Enum):
 class AnalysisSession(TimeStampedModel):
     TYPE_FILES = Choices(('bro_http_log','BRO weblogs http.log'),
                          ('cisco_file', 'CISCO weblogs Specific File'),
-                         ('argus_netflow','Netflow file from argus capture'))
+                         ('argus_netflow','Netflow file from argus capture'),
+                         ('json_profile', 'Profile file'))
+
     INFO_ATTRIBUTES = {TYPE_FILES.cisco_file: {'url':'http.url', 'ip_dist':'endpoints.server'},
                        TYPE_FILES.bro_http_log: {'url': 'host', 'ip_dist': 'id.resp_h'},
-                       TYPE_FILES.argus_netflow: {}}
+                       TYPE_FILES.argus_netflow: {},
+                       TYPE_FILES.json_profile: {}}
+
 
     users = models.ManyToManyField(User, through='AnalysisSessionUsers')
     name = models.CharField(max_length=200, blank=False, null=False, default='Name by Default')

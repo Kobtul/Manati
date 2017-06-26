@@ -1193,6 +1193,7 @@ function AnalysisSessionLogic(){
                 e.preventDefault();
             });
 
+
         });
     };
     var getProfileFromServer = function (analysis_session_id) {

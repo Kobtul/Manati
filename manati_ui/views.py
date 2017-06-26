@@ -75,7 +75,6 @@ def create_analysis_session(request):
         u_data_list = json.loads(request.POST.get('data[]',''))
         u_key_list = json.loads(request.POST.get('headers[]',''))
         type_file = request.POST.get('type_file','')
-        print type_file
         analysis_session = AnalysisSession.objects.create(filename, u_key_list, u_data_list,current_user,type_file)
 
         if not analysis_session :
@@ -242,6 +241,33 @@ def convert(data):
     else:
         return data
 
+@csrf_exempt
+def save_profile(request):
+    try:
+        if request.method == 'POST':
+            current_user = request.user
+            received_json_data = json.loads(request.body)
+            profile = received_json_data['profile']
+            filename = received_json_data['filename']
+            analysis_session = AnalysisSession.objects.create_with_profile(filename,profile ,current_user)
+            if not analysis_session:
+                # messages.error(request, 'Analysis Session wasn\'t created .')
+                return HttpResponseServerError("Error saving the data")
+            else:
+                # messages.success(request, 'Analysis Session was created .')
+                analysis_session_id = analysis_session.id
+                call_after_save_event(analysis_session)
+                return JsonResponse(
+                    dict(data={'analysis_session_id': analysis_session_id, 'filename': analysis_session.name},
+                         msg='Analysis Session was created .'))
+        else:
+            messages.error(request, 'Only POST request')
+            return HttpResponseServerError("Only POST request")
+    except Exception as e:
+        error = print_exception()
+        logger.error(str(error))
+        logger.error(str(e.message))
+        return HttpResponseServerError("ERROR in the server: " + str(e.message) + "\n:" + error)
 @csrf_exempt
 def get_profile(request):
     try:

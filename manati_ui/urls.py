@@ -29,5 +29,6 @@ urlpatterns = [
     url(r'^profile_view', views.new_profile_session_view, name='profile'),
     url(r'^analysis_session/create_profile', views.create_profile, name='create_profile'),
     url(r'^analysis_session/get_profile', views.get_profile, name='get_profile'),
+    url(r'^analysis_session/save_profile', views.save_profile, name='save_profile'),
 
 ]
