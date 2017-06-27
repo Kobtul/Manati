@@ -460,7 +460,7 @@ def render_edit_analysis_session(request,analysis_session_id):
     context = {"analysis_session_id": analysis_session_id}
     analysis_session = AnalysisSession.objects.get(id=analysis_session_id)
 
-    if(analysis_session.type_file == 'argus_netflow'):
+    if(analysis_session.type_file == 'argus_netflow' or analysis_session.type_file == 'json_profile'):
         return render(request, 'manati_ui/profile/edit.html', context)
     else:
         return render(request, 'manati_ui/analysis_session/edit.html', context)
