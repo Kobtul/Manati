@@ -133,7 +133,7 @@ def processLine(lineDict, lastTimeID):
 
     if (ipFrom in result):
         addFeaturesForIP('client',ipFrom,ipTo,lineDict,dur,protocol,sourcePort,dstPort,connectionInformationState,totalPakets,totBytes,srcBytes)
-    elif (ipTo in result):
+    if (ipTo in result):
         addFeaturesForIP('server',ipTo,ipFrom,lineDict,dur,protocol,sourcePort,dstPort,connectionInformationState,totalPakets,totBytes,srcBytes)
 
 
