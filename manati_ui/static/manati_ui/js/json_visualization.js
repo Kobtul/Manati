@@ -409,7 +409,6 @@ function DrawVisualization() {
     };
     this.showJSON = function (json) {
         _jsonprofile = json;
-        $("#save-profile").show(); // not sure if it is a bad practice to rely that this does not work when the element is not present
         $("#save-profile").on("click", function () {
             var filname = $("#weblogfile-name").text();
             var data = {
