@@ -268,7 +268,8 @@ function DrawVisualization() {
     {
         $(".btn-groupIPS").empty();
         $(".btn-groupIPS").show();
-        $("#dayprofilecolapse").hide();
+        $("#dayprofilecolapse").css('visibility', 'hidden');
+        //$("#dayprofilecolapse").hide();
 
 
         $.each(_jsonprofile, function (k, v) {
@@ -313,22 +314,25 @@ function DrawVisualization() {
             }
             $(".btn-groupDays").append($something2);
         }
+        if(typeof _selectedDate !== 'undefined')
+        {
+            initializeDayliSumary();
+        }
         if(typeof _selectedHour !== 'undefined')
         {
-            if (Object.keys(_jsonprofile[_selectedIP]["time"][_selectedDate]).length > 1) {
-                var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]["hoursummary"];
-                for (var feature in dict) {
-                    drawDailyGraph(feature);
-                }
-                $("#dayprofilecolapse").show();
-            }
             generateHourLayerOfButtons();
         }
         $(".btn-groupDays .btn").on("click", function (e) {
             _selectedDate = $(this).val();
             e.preventDefault();
             $(this).addClass('btn-info').siblings().removeClass('btn-info');
-            if (Object.keys(_jsonprofile[_selectedIP]["time"][_selectedDate]).length > 1) {
+            initializeDayliSumary();
+            generateHourLayerOfButtons();
+        });
+    }
+    function initializeDayliSumary()
+    {
+        if (Object.keys(_jsonprofile[_selectedIP]["time"][_selectedDate]).length >= 1) {
                 var dict = _jsonprofile[_selectedIP]["time"][_selectedDate];
                 var randomhour;
                 for (var hour in dict) {
@@ -336,13 +340,22 @@ function DrawVisualization() {
                     break;
                 }
                 var dict_2 = _jsonprofile[_selectedIP]["time"][_selectedDate][randomhour]["hoursummary"];
+                //  $("#demo").removeClass("in");
+                var isColapsed = true;
+
+                if ($('#demo').hasClass("in")) {
+                    isColapsed = false;
+                }
+                $("#demo").addClass("in");
                 for (var feature in dict_2) {
                     drawDailyGraph(feature);
                 }
-                $("#dayprofilecolapse").show();
+                if(isColapsed) {
+                    $("#demo").removeClass("in");
+                }
+                //$("#dayprofilecolapse").show();
+                $("#dayprofilecolapse").css('visibility', 'visible');
             }
-            generateHourLayerOfButtons();
-        });
     }
     function generateHourLayerOfButtons() {
         var hours = [];
@@ -397,7 +410,8 @@ function DrawVisualization() {
         $(".btn-groupHours").empty();
         $("#backbutton").hide();
         $("#forwardbutton").hide();
-        $("#dayprofilecolapse").hide();
+        //$("#dayprofilecolapse").hide();
+        $("#dayprofilecolapse").css('visibility', 'hidden');
         $("#featurestabs .tab").empty();
         $(".tab-content").css('visibility', 'hidden');
         $("#featurestabs").css('visibility', 'hidden');
@@ -564,13 +578,11 @@ function DrawVisualization() {
                         vAxis: {format: 'decimal'},
                     };
         //child.style.display = 'block';
-        $("#demo").addClass("in");
         var chart = new google.visualization.LineChart(child);
-        google.visualization.events.addListener(chart, 'ready', function () {
+        /*google.visualization.events.addListener(chart, 'ready', function () {
             //child.style.display = 'none';
             $("#demo").removeClass("in");
-
-        });
+        });*/
         chart.draw(dataTable, google.charts.Bar.convertOptions(options));
     }
     function drawDataTable(name){
