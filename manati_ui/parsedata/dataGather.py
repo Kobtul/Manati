@@ -86,8 +86,8 @@ def initializeTempHourDict(tempDict):
 
     initializePortFeatures(tempDict)
 
-    tempDict['serverSourcePortDictIPsTCP'] = {}
-    tempDict['serverSourcePortDictIPsUDP'] = {}
+    tempDict['serverDestinationPortDictIPsTCP'] = {}
+    tempDict['serverDestinationPortDictIPsUDP'] = {}
 
     tempDict['clientDestinationPortDictIPsTCP'] = {}
     tempDict['clientDestinationPortDictIPsUDP'] = {}
@@ -218,7 +218,7 @@ def fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarg
     if clientorserver == 'client':
         portDictIPS = 'clientDestinationPortDictIPs'
     else:
-        portDictIPS = 'serverSourcePortDictIPs'
+        portDictIPS = 'serverDestinationPortDictIPs'
 
     if protocol == 'tcp':
         addPortDictIPSToDict (ipFeaturesTemp, portDictIPS + 'TCP', dstPort, ipTarget)

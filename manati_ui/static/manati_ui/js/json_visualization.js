@@ -78,8 +78,8 @@ function DrawVisualization() {
             if (typeof _selectedIP !== 'undefined') {
                 drawTable('clientDestinationPortDictIPsTCP');
                 drawTable('clientDestinationPortDictIPsUDP');
-                drawTable('serverSourcePortDictIPsTCP');
-                drawTable('serverSourcePortDictIPsUDP');
+                drawTable('serverDestinationPortDictIPsTCP');
+                drawTable('serverDestinationPortDictIPsUDP');
             }
         });
         $("a[href='#json_tab']").on('shown.bs.tab', function (e) {
