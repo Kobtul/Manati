@@ -13,7 +13,7 @@ function DrawVisualization() {
 
     if(typeof google !== 'undefined') {
         google.charts.load('current', {'packages': ['geochart', 'corechart', 'table', 'bar']});
-        google.charts.setOnLoadCallback(redrawVisualization());
+        google.charts.setOnLoadCallback(initgooglecharts());
     }
     function regioMap() {
         $(window).on('drawmap', function (e) {
@@ -22,23 +22,6 @@ function DrawVisualization() {
             //Concurrent.Thread.create(drawRegioMap);
         });
     }
-
-
-
-
-    function redrawVisualization() {
-        //if(_selectedIP) {
-    /*    if (typeof _selectedIP !== 'undefined') {
-            drawSumaryTable();
-            drawRegioMap();
-            $('#histograms_div').empty();
-            drawPortFeatures();
-            drawTable('clientDestinationPortDictIPsTCP');
-            drawTable('clientDestinationPortDictIPsUDP');
-
-
-        }*/
-    };
     function drawPortFeatures() {
         var s = ['client', 'server'];
         var d = ['SourcePort', 'DestinationPort'];
@@ -62,207 +45,108 @@ function DrawVisualization() {
     function showCurrentJson() {
         visualizeJSONtoHTML(_jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour]);
     }
-
-
-    $("a[href='#sumary_tab']").on('shown.bs.tab', function (e) {
-        var target = $(e.target).attr("href"); // activated tab
-        //alert(target);
-        if (typeof _selectedIP !== 'undefined') {
-            drawSumaryTable();
-        }
-    });
-    $("a[href='#regions_tab']").on('shown.bs.tab', function (e) {
-        if (typeof _selectedIP !== 'undefined') {
-            drawRegioMap('clientDictNumberOfDistinctCountries');
-            drawRegioMap('serverDictNumberOfDistinctCountries');
-
-        }
-    });
-
-    $("a[href='#donutchart_tab']").on('shown.bs.tab', function (e) {
-        if (typeof _selectedIP !== 'undefined') {
-            drawDonutChart('clientDictClassBnetworks');
-            drawDonutChart('serverDictClassBnetworks');
-
-        }
-    });
-    $("a[href='#histograms_tab']").on('shown.bs.tab', function (e) {
-        if (typeof _selectedIP !== 'undefined') {
-            $('#histograms_div').empty();
-            drawPortFeatures();
-        }
-    });
-    $("a[href='#tables_tab']").on('shown.bs.tab', function (e) {
-        if (typeof _selectedIP !== 'undefined') {
-            drawTable('clientDestinationPortDictIPsTCP');
-            drawTable('clientDestinationPortDictIPsUDP');
-            drawTable('serverSourcePortDictIPsTCP');
-            drawTable('serverSourcePortDictIPsUDP');
-        }
-    });
-    $("a[href='#json_tab']").on('shown.bs.tab', function (e) {
-        /*if ($(this).hasClass("active")) {
-            return false;
-        }*/
-        if (typeof _selectedIP !== 'undefined') {
-            showCurrentJson();
-        }
-    });
-    $("a[href='#notanweredconnections_tab']").on('shown.bs.tab', function (e) {
-        drawDataTable('clientDictOfNonAnsweredConnections');
-        drawDataTable('serverDictOfNonAnsweredConnections');
-    });
-    $("a[href='#testing_tab']").on('shown.bs.tab', function (e) {
-        newJsonStyle();
-    });
-
-    $('#logcheckbox').change(function() {
-        refreshTab();
-    });
-    function newJsonStyle() {
-        var margin = {top: 30, right: 20, bottom: 30, left: 20},
-            width = 960 - margin.left - margin.right,
-            barHeight = 20,
-            barWidth = width * .8;
-
-        var i = 0,
-            duration = 400,
-            root;
-
-        var tree = d3.layout.tree()
-            .nodeSize([0, 20]);
-
-        var diagonal = d3.svg.diagonal()
-            .projection(function(d) { return [d.y, d.x]; });
-
-        var svg = d3.select("#testing_tab").append("svg")
-            .attr("width", width + margin.left + margin.right)
-          .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        d3.json("result.json", function(error, flare) {
-          if (error) throw error;
-
-          flare.x0 = 0;
-          flare.y0 = 0;
-          update(root = flare);
+    function initgooglecharts() {
+        $("a[href='#sumary_tab']").on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href"); // activated tab
+            //alert(target);
+            if (typeof _selectedIP !== 'undefined') {
+                drawSumaryTable();
+            }
         });
-       /* _jsonprofile.x0 = 0;
-        _jsonprofile.y0 = 0;
+        $("a[href='#regions_tab']").on('shown.bs.tab', function (e) {
+            if (typeof _selectedIP !== 'undefined') {
+                drawRegioMap('clientDictNumberOfDistinctCountries');
+                drawRegioMap('serverDictNumberOfDistinctCountries');
 
-        update(root = _jsonprofile);*/
+            }
+        });
 
-        function update(source) {
+        $("a[href='#donutchart_tab']").on('shown.bs.tab', function (e) {
+            if (typeof _selectedIP !== 'undefined') {
+                drawDonutChart('clientDictClassBnetworks');
+                drawDonutChart('serverDictClassBnetworks');
 
-                  // Compute the flattened node list. TODO use d3.layout.hierarchy.
-                  var nodes = tree.nodes(root);
+            }
+        });
+        $("a[href='#histograms_tab']").on('shown.bs.tab', function (e) {
+            if (typeof _selectedIP !== 'undefined') {
+                $('#histograms_div').empty();
+                drawPortFeatures();
+            }
+        });
+        $("a[href='#tables_tab']").on('shown.bs.tab', function (e) {
+            if (typeof _selectedIP !== 'undefined') {
+                drawTable('clientDestinationPortDictIPsTCP');
+                drawTable('clientDestinationPortDictIPsUDP');
+                drawTable('serverSourcePortDictIPsTCP');
+                drawTable('serverSourcePortDictIPsUDP');
+            }
+        });
+        $("a[href='#json_tab']").on('shown.bs.tab', function (e) {
+            /*if ($(this).hasClass("active")) {
+             return false;
+             }*/
+            if (typeof _selectedIP !== 'undefined') {
+                showCurrentJson();
+            }
+        });
+        $("a[href='#notanweredconnections_tab']").on('shown.bs.tab', function (e) {
+            drawDataTable('clientDictOfNonAnsweredConnections');
+            drawDataTable('serverDictOfNonAnsweredConnections');
+        });
+        $("a[href='#testing_tab']").on('shown.bs.tab', function (e) {
+            newPie("1");
+            newPie("2");
+        });
 
-                  var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom);
+        $('#logcheckbox').change(function () {
+            refreshTab();
+        });
+    }
 
-                  d3.select("svg").transition()
-                      .duration(duration)
-                      .attr("height", height);
+    function newPie(name) {
+        //var Chart = require('chart.js');
+        var data = {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+            datasets: [{
+                label: "Dataset #1",
+                backgroundColor: "rgba(255,99,132,0.2)",
+                borderColor: "rgba(255,99,132,1)",
+                borderWidth: 2,
+                hoverBackgroundColor: "rgba(255,99,132,0.4)",
+                hoverBorderColor: "rgba(255,99,132,1)",
+                data: [65, 59, 20, 81, 56, 55, 40],
+            }]
+        };
 
-                  d3.select(self.frameElement).transition()
-                      .duration(duration)
-                      .style("height", height + "px");
+        var options = {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    stacked: true,
+                    gridLines: {
+                        display: true,
+                        color: "rgba(255,99,132,0.2)"
+                    }
+                }],
+                xAxes: [{
+                    gridLines: {
+                        display: false
+                    }
+                }]
+            }
+        };
 
-                  // Compute the "layout".
-                  nodes.forEach(function(n, i) {
-                    n.x = i * barHeight;
-                  });
-
-                  // Update the nodes…
-                  var node = svg.selectAll("g.node")
-                      .data(nodes, function(d) { return d.id || (d.id = ++i); });
-
-                  var nodeEnter = node.enter().append("g")
-                      .attr("class", "node")
-                      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-                      .style("opacity", 1e-6);
-
-                  // Enter any new nodes at the parent's previous position.
-                  nodeEnter.append("rect")
-                      .attr("y", -barHeight / 2)
-                      .attr("height", barHeight)
-                      .attr("width", barWidth)
-                      .style("fill", color)
-                      .on("click", click);
-
-                  nodeEnter.append("text")
-                      .attr("dy", 3.5)
-                      .attr("dx", 5.5)
-                      .text(function(d) { return d.name; });
-
-                  // Transition nodes to their new position.
-                  nodeEnter.transition()
-                      .duration(duration)
-                      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-                      .style("opacity", 1);
-
-                  node.transition()
-                      .duration(duration)
-                      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-                      .style("opacity", 1)
-                    .select("rect")
-                      .style("fill", color);
-
-                  // Transition exiting nodes to the parent's new position.
-                  node.exit().transition()
-                      .duration(duration)
-                      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
-                      .style("opacity", 1e-6)
-                      .remove();
-
-                  // Update the links…
-                  var link = svg.selectAll("path.link")
-                      .data(tree.links(nodes), function(d) { return d.target.id; });
-
-                  // Enter any new links at the parent's previous position.
-                  link.enter().insert("path", "g")
-                      .attr("class", "link")
-                      .attr("d", function(d) {
-                        var o = {x: source.x0, y: source.y0};
-                        return diagonal({source: o, target: o});
-                      })
-                    .transition()
-                      .duration(duration)
-                      .attr("d", diagonal);
-
-                  // Transition links to their new position.
-                  link.transition()
-                      .duration(duration)
-                      .attr("d", diagonal);
-
-                  // Transition exiting nodes to the parent's new position.
-                  link.exit().transition()
-                      .duration(duration)
-                      .attr("d", function(d) {
-                        var o = {x: source.x, y: source.y};
-                        return diagonal({source: o, target: o});
-                      })
-                      .remove();
-
-                  // Stash the old positions for transition.
-                  nodes.forEach(function(d) {
-                    d.x0 = d.x;
-                    d.y0 = d.y;
-                  });
-                }
-                // Toggle children on click.
-                function click(d) {
-                  if (d.children) {
-                    d._children = d.children;
-                    d.children = null;
-                  } else {
-                    d.children = d._children;
-                    d._children = null;
-                  }
-                  update(d);
-                }
-                function color(d) {
-                  return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
-                }
+        /*Chart.Bar('chart', {
+            options: options,
+            data: data
+        });*/
+        // And for a doughnut chart
+        var myDoughnutChart = new Chart('chart' + name, {
+            type: 'doughnut',
+            data: data,
+            options: options
+        });
     }
     function generateIPLayerOfButtons()
     {
@@ -799,10 +683,35 @@ function DrawVisualization() {
     function drawDonutChart(nameofdict)
     {
         var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][nameofdict];
-        if ($('#donutchart_div' + ' .' + nameofdict).length == 0) {
-                var div = $('<div/>').attr({class: nameofdict+ " donutchart", type: 'div'});
-                //$('#regions_div').append("<h4>" + nameofdict + ":</h4>");
-                $('#donutchart_div').append(div);
+        if ($('#'+nameofdict).length == 0) {
+                var somerandomdiv = $('<div/>').attr({class:"randomdiv", type: 'div'});
+               /* somerandomdiv.css('width',"50%");
+                somerandomdiv.css('height',"0");
+                somerandomdiv.css('padding-bottom',"50%");*/
+               /*
+                position: relative;
+                padding-bottom: 100%;
+                height: 0;
+                overflow:hidden;
+                */
+                var div = $('<div/>').attr({id: nameofdict, type: 'div'});
+                div.css({
+                    position: "absolute",
+                    top: "0",
+                    left: "0",
+                    width: "100%",
+                    height: "100%"
+                });
+                somerandomdiv.css({
+                    position: "relative",
+                    paddingBottom: "50%",
+                     height: "0",
+                    //height: "50%",
+                    //width: "50%",
+                    overflow:"hidden",
+                });
+                somerandomdiv.append(div);
+                $('#donutchart_div').append(somerandomdiv);
         }
         var dataTable = new google.visualization.DataTable();
             dataTable.addColumn('string', 'ClassB IP');
@@ -814,13 +723,16 @@ function DrawVisualization() {
         }
         var options = {
           title: nameofdict,
+          width: '100%',
+          height: '100%',
+          sliceVisibilityThreshold:0,
+          //legend:{position:"bottom"},
           //is3D: true,
           pieHole: 0.4,
         };
 
-        var parent = document.getElementById("donutchart_div");
-        var child = parent.getElementsByClassName(nameofdict)[0];
-        var chart = new google.visualization.PieChart(child/*document.getElementById('regions_div')*/);
+        var target = document.getElementById(nameofdict);
+        var chart = new google.visualization.PieChart(target);
         chart.draw(dataTable, options);
     }
     function drawRegioMap(name) {
