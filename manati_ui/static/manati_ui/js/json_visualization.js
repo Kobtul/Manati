@@ -95,8 +95,41 @@ function DrawVisualization() {
             drawDataTable('serverDictOfNonAnsweredConnections');
         });
         $("a[href='#testing_tab']").on('shown.bs.tab', function (e) {
-            newPie("1");
-            newPie("2");
+            $('#myPlot').empty();
+
+            //newPie("1");
+            //newPie("2");
+            var myData = getMockupData();
+			var myPlot = TimelinesChart()
+				.width(window.innerWidth)
+				.zScaleLabel("My Scale Units");
+			var date1 = new Date(Date.UTC(2013, 1, 1, 14, 0, 0));
+            var date2 = new Date(Date.UTC(2015, 1, 1, 14, 0, 0));
+            var date3 = new Date(Date.UTC(2025, 1, 1, 14, 0, 0));
+
+
+            var testData = [
+                {
+                    group: "group1name",
+                    data: [
+                        {
+                            label: "label1name",
+                            data: [
+                                {
+                                    timeRange: [date1, date2],
+                                    val: 0.2
+                                },
+                                {
+                                    timeRange: [date2, date3],
+                                    val: 0.8
+                                },
+                            ]
+                        }
+                    ]
+                }];
+//		    document.addEventListener("DOMContentLoaded", function() {
+			    myPlot(document.getElementById("myPlot"), myData);
+//		    });
         });
 
         $('#logcheckbox').change(function () {
@@ -802,4 +835,60 @@ function DrawVisualization() {
          chart.draw();
          */
     };
+    function getMockupData() {
+
+        var NGROUPS = 6;
+        var MAXLINES = 15;
+        var MAXSEGMENTS = 20;
+        var MINTIME = new Date(new Date() - 3 * 365 * 24 * 60 * 60 * 1000);
+
+        function getGroupData() {
+
+            function getSegmentsData() {
+
+                var segData = [];
+
+                var nSegments = Math.ceil(Math.random() * MAXSEGMENTS);
+                var segMaxLength = Math.round(((new Date()) - MINTIME) / nSegments);
+                var runLength = MINTIME;
+
+                for (var i = 0; i < nSegments; i++) {
+                    var tDivide = [Math.random(), Math.random()].sort();
+                    var start = new Date(runLength.getTime() + tDivide[0] * segMaxLength);
+                    var end = new Date(runLength.getTime() + tDivide[1] * segMaxLength);
+                    runLength = new Date(runLength.getTime() + segMaxLength);
+                    segData.push({
+                        'timeRange': [start, end],
+                        'val': Math.random()
+                        //'labelVal': is optional - only displayed in the labels
+                    });
+                }
+
+                return segData;
+
+            }
+
+            var grpData = [];
+
+            for (var i = 0, nLines = Math.ceil(Math.random() * MAXLINES); i < nLines; i++) {
+                grpData.push({
+                    'label': 'label' + (i + 1),
+                    'data': getSegmentsData()
+                });
+            }
+            return grpData;
+        }
+
+        var data = [];
+
+        for (var i = 0; i < NGROUPS; i++) {
+            data.push({
+                'group': 'group' + (i + 1),
+                'data': getGroupData()
+            });
+        }
+
+        return data;
+    }
+
 }
