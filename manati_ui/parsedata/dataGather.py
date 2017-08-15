@@ -48,17 +48,11 @@ def fillFeaturesClassFromTempClass(time):
         return
     dataDateID = time.split (' ')[0]
     dataHourID = time.split (' ')[1]
-    # for ip in result:
-    #     dictHourFeatures = result[ip]
-    #     dictHourFeatures['time'][dataDateID][dataHourID] = {}
-
     for ip in result:
 
         ipfeaturesTimeDict = temp[ip]
         temp[ip] = {}
 
-        #ipfeaturesTimeDict['hoursummary']['numberOfIPSContactedAsClient'] = len (ipfeaturesTimeDict['clientDictIPSContacted'])
-        #ipfeaturesTimeDict['hoursummary']['numberOfIPSContactedAsServer'] = len (ipfeaturesTimeDict['setOfIPSContactedAsServer'])
         ipfeaturesTimeDict['hoursummary']['clientNumberOfNonAnsweredConnections'] = len (ipfeaturesTimeDict['clientDictOfNonAnsweredConnections'])
         ipfeaturesTimeDict['hoursummary']['serverNumberOfNonAnsweredConnections'] = len (ipfeaturesTimeDict['serverDictOfNonAnsweredConnections'])
 
@@ -78,11 +72,12 @@ def initializeTempHourDict(tempDict):
     initializeNumberFeatureAsServerAsClient(tempDict['hoursummary'],'NumberOfIPFlows')
     initializeNumberFeatureAsServerAsClient(tempDict['hoursummary'],'TotalNumberOfTransferedData')
 
-    #tempDict['clientDictIPSContacted'] = {}
     initializeDictFeatureAsServerAsClient (tempDict, 'DictOfNonAnsweredConnections')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctCountries')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctOrganizations')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictClassBnetworks')
+
+    initializeDictFeatureAsServerAsClient(tempDict,'PAPAconections')
 
     initializePortFeatures(tempDict)
 
@@ -91,6 +86,8 @@ def initializeTempHourDict(tempDict):
 
     tempDict['clientDestinationPortDictIPsTCP'] = {}
     tempDict['clientDestinationPortDictIPsUDP'] = {}
+
+
 
 def initializeDictFeatureAsServerAsClient(dict,name):
     dict['client' + name] = {}
@@ -157,12 +154,8 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
             addFeaturesToDict (ipFeaturesTemp, clientorserver +'DictNumberOfDistinctOrganizations',
                                whoiscache.get_organization_of_ip (ipTarget), 1)
 
-            # ipFeaturesTemp['clientDictNumberOfDistinctOrganizations'].add (whoiscache.get_organization_of_ip (ipTo))
         classB = ipTarget.split ('.')[0] + '.' + ipTarget.split ('.')[1]
-
-        # ipFeaturesTemp['clientDictClassBnetworks'].add (classB)
         addFeaturesToDict(ipFeaturesTemp, clientorserver +'DictClassBnetworks', classB, 1)
-
         ipFeaturesTemp['hoursummary'][clientorserver+'TotalNumberOfTransferedData'] = ipFeaturesTemp['hoursummary'][
                                                                         clientorserver+'TotalNumberOfTransferedData'] + totBytes
         fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict)
@@ -175,25 +168,15 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
 
         # ipFeaturesTemp['clientDictOfNonAnsweredConnections'].add (ipTo)
     elif (detectPAPAsituation (connectionInformationState)):
-        # print(line)
-        # TODO fix this
-        # try:
-        #     conto = connectionCache[ipFrom]
-        #     #if (conto != ipTo):
-        #     if(not (ipTo in conto)):
-        #         connectionCache[ipFrom].add (ipTo)
-        #         ipFeaturesTemp['clientDictIPSContacted'].add (ipTo)
-        #         ipFeaturesTemp['setClientNummberOfDistinctCountries'].add (getCountryFromWhoisCache (ipTo))
-        #     else:
-        #         pass
-        # except KeyError:
-        #     connectionCache[ipFrom] = set()
-        #     connectionCache[ipFrom].add(ipTo)
-        #     ipFeaturesTemp['clientDictIPSContacted'].add (ipTo)
-        #     ipFeaturesTemp['setClientNummberOfDistinctCountries'].add (getCountryFromWhoisCache (ipTo))
-        pass
+        if detectEndingConection(connectionInformationState):
+            #print "Connection ended"
+            pass
+        else:
+            if ipTarget in ipFeaturesTemp[clientorserver + 'PAPAconections']:
+                ipFeaturesTemp[clientorserver + 'PAPAconections'][ipTarget]+=1
+            else:
+                ipFeaturesTemp[clientorserver + 'PAPAconections'][ipTarget]=1
     else:
-        pass
         print (convertDictToLine(lineDict))
 
     ipFeaturesTemp['hoursummary']['numberOfIPFlows'] = ipFeaturesTemp['hoursummary']['numberOfIPFlows'] + 1
@@ -289,22 +272,14 @@ def detectPAPAsituation(connectionInformation):
     if ('A' in connectionInformationFrom and 'A' in connectionInformationTo):
         return True
     return False
-    # if (ipFrom in result or EXAMINEALLCOMPUTERS):
-    #     ipFeaturesTemp = temp[ipFrom]
-    #     ipFeaturesTemp['clientNumberOfIPFlows'] = ipFeaturesTemp['clientNumberOfIPFlows'] + 1
-    #     if (connectionDirection == '<->' or connectionDirection == '<?>'):
-    #         ipFeaturesTemp['clientDictIPSContacted'].add(ipTo)
-    #         ipFeaturesTemp['setClientNummberOfDistinctCountries'].add(getCountryFromWhoisCache(ipTo))
-    # if (ipTo in result or EXAMINEALLCOMPUTERS):
-    #     ipFeaturesTemp = temp[ipTo]
-    #     ipFeaturesTemp['clientNumberOfIPFlows'] = ipFeaturesTemp['clientNumberOfIPFlows'] + 1
-    #     if (connectionDirection == '<->' or connectionDirection == '<?>'):
-    #         ipFeaturesTemp['clientDictIPSContacted'].add(ipFrom)
-    # if (connectionDirection != '<->'):
-    #    print(line)
-
-
-
+def detectEndingConection(connectionInformation):
+    if (len (connectionInformation.split ('_')) != 2):
+        return False
+    connectionInformationFrom = connectionInformation.split('_')[0]
+    connectionInformationTo = connectionInformation.split('_')[1]
+    if ('F' in connectionInformationFrom or 'F' in connectionInformationTo or 'R' in connectionInformationFrom or 'R' in connectionInformationTo):
+        return True
+    return False
 def stripSpacesFromConnection(string):
     string.lstrip (' ')
     string = string[2:]
