@@ -340,6 +340,7 @@ function DrawVisualization() {
     };
     this.showJSON = function (json) {
         _jsonprofile = json;
+        exportToFile();
         $("#save-profile").on("click", function () {
             var filname = $("#weblogfile-name").text();
             var data = {
@@ -372,6 +373,11 @@ function DrawVisualization() {
                 $.notify(e, "error");
             }
         });
+        $("#get-raw-json").on("click", function () {
+            exportToFile()
+        });
+
+
     /*$(document).ready(function() {
         alert("Ready sir")
     });*/
@@ -410,7 +416,20 @@ function DrawVisualization() {
             $('#featurestabs a[href="' + tabLink + '"]').tab('show');
         });
     };
+    function exportToFile() {
+        //var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(_jsonprofile);
+        //location.href = csvData;
+        var json = JSON.stringify(_jsonprofile);
+        var blob = new Blob([json], {type: "application/json"});
+        var url  = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.download    = _filename + ".json";
+        a.href        = url;
+        a.textContent = "Download "+_filename;
+        a.className = "btn btn-primary";
+        document.getElementById('savefilediv').appendChild(a);
 
+    }
     function drawTable(name) {
         var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
         if ($('#table_div' + ' .' + name).length == 0) {

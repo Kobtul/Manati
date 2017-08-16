@@ -1212,7 +1212,8 @@ function AnalysisSessionLogic(){
                      $('#wrap-form-upload-computersmd').show();
                  }
                  else {
-                     thiz.showJson(data)
+                     setFileName(data["name"]);
+                     thiz.showJson(data["data"]);
                  }
            },
            error:function(exception){

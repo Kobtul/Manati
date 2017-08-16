@@ -275,12 +275,14 @@ def get_profile(request):
             user = request.user
             received_json_data = json.loads(request.body)
             analysis_session_id = received_json_data['analysis_session_id']
+            analysis_session = AnalysisSession.objects.get(id=analysis_session_id)
             if user.is_authenticated():
                 result = {}
                 for profile in Profile.objects.filter(analysissession=analysis_session_id):
                     result[profile.ip] = profile.data
+                name = AnalysisSession.objects.filter(id=analysis_session_id).first()
                 #return JsonResponse(dict(data=json.dumps(result),msg='Getting Weblogs Whois-Related DONE'))
-                return JsonResponse(result)
+                return JsonResponse(dict(data=result,name=analysis_session.name))
 
         else:
             messages.error(request, 'Only POST request')

@@ -9,6 +9,12 @@
             <img id="loading-img" width="33" style="display: none;" src="{% static 'manati_ui/images/ajax-loader.gif' %}"/>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-10" id="savefilediv">
+            <!--<a href="#" id="get-raw-json" >Export data into Excel</a>-->
+            <!--<input type="button" download="result.json" id="get-raw-json" class="btn btn-primary" value="Save to disk"/>-->
+        </div>
+    </div>
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -27,7 +33,6 @@
                             <input type="text" class="form-control" readonly>
                         </div>
                     </div>
-                    <!--<input type="button" id="get-raw-json" class="btn btn-primary" value="Show Profile from server" />-->
                     <div class="form-group">
                         <div id="loading-circle" style="margin-bottom: 39px"></div>
                     </div>
