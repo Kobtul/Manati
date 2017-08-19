@@ -27,14 +27,17 @@ function DrawVisualization() {
         var d = ['SourcePort', 'DestinationPort'];
         var f = ['TotalBytes', 'TotalPackets', 'NumberOfFlows'];
         var p = ['TCP', 'UDP'];
-        var si, di, fi, pi;
+        var e = ['Established','NotEstablished']
+        var si, di, fi, pi,ei;
         var name;
         for (si = 0; si < s.length; ++si) {
             for (di = 0; di < d.length; ++di) {
                 for (pi = 0; pi < p.length; ++pi) {
                     for (fi = 0; fi < f.length; ++fi) {
-                        name = s[si] + d[di] + f[fi] + p[pi];
-                        drawHistogram(name);
+                        for (ei = 0; ei < e.length; ++ei) {
+                            name = s[si] + d[di] + f[fi] + p[pi] + e[ei];
+                            drawHistogram(name);
+                        }
                     }
                 }
             }
@@ -55,16 +58,16 @@ function DrawVisualization() {
         });
         $("a[href='#regions_tab']").on('shown.bs.tab', function (e) {
             if (typeof _selectedIP !== 'undefined') {
-                drawRegioMap('clientDictNumberOfDistinctCountries');
-                drawRegioMap('serverDictNumberOfDistinctCountries');
+                drawRegioMap('clientDictNumberOfDistinctCountriesEstablished');
+                drawRegioMap('serverDictNumberOfDistinctCountriesEstablished');
 
             }
         });
 
         $("a[href='#donutchart_tab']").on('shown.bs.tab', function (e) {
             if (typeof _selectedIP !== 'undefined') {
-                drawDonutChart('clientDictClassBnetworks');
-                drawDonutChart('serverDictClassBnetworks');
+                drawDonutChart('clientDictClassBnetworksEstablished');
+                drawDonutChart('serverDictClassBnetworksEstablished');
 
             }
         });
@@ -76,10 +79,10 @@ function DrawVisualization() {
         });
         $("a[href='#tables_tab']").on('shown.bs.tab', function (e) {
             if (typeof _selectedIP !== 'undefined') {
-                drawTable('clientDestinationPortDictIPsTCP');
-                drawTable('clientDestinationPortDictIPsUDP');
-                drawTable('serverDestinationPortDictIPsTCP');
-                drawTable('serverDestinationPortDictIPsUDP');
+                drawTable('clientDestinationPortDictIPsTCPEstablished');
+                drawTable('clientDestinationPortDictIPsUDPEstablished');
+                drawTable('serverDestinationPortDictIPsTCPEstablished');
+                drawTable('serverDestinationPortDictIPsUDPEstablished');
             }
         });
         $("a[href='#json_tab']").on('shown.bs.tab', function (e) {
@@ -91,8 +94,8 @@ function DrawVisualization() {
             }
         });
         $("a[href='#notanweredconnections_tab']").on('shown.bs.tab', function (e) {
-            drawDataTable('clientDictOfNonAnsweredConnections');
-            drawDataTable('serverDictOfNonAnsweredConnections');
+            drawDataTable('clientDictOfConnectionsNotEstablished');
+            drawDataTable('serverDictOfConnectionsNotEstablished');
         });
         $("a[href='#testing_tab']").on('shown.bs.tab', function (e) {
             $('#myPlot').empty();
@@ -272,6 +275,10 @@ function DrawVisualization() {
                 }
                 //$("#dayprofilecolapse").show();
                 $("#dayprofilecolapse").css('visibility', 'visible');
+                $("#dayprofilecolapse").notify(
+                    "Not established features are not yet reliable in summary",
+                    { position:"top",autoHideDelay: 5000,className:"warn" }
+                );
             }
     }
     function generateHourLayerOfButtons() {
@@ -340,7 +347,7 @@ function DrawVisualization() {
     };
     this.showJSON = function (json) {
         _jsonprofile = json;
-        exportToFile();
+        //exportToFile();
         $("#save-profile").on("click", function () {
             var filname = $("#weblogfile-name").text();
             var data = {
@@ -416,7 +423,7 @@ function DrawVisualization() {
             $('#featurestabs a[href="' + tabLink + '"]').tab('show');
         });
     };
-    function exportToFile() {
+    this.exportToFile =function() {
         //var csvData = 'data:application/csv;charset=utf-8,' + encodeURIComponent(_jsonprofile);
         //location.href = csvData;
         var json = JSON.stringify(_jsonprofile);
@@ -429,7 +436,7 @@ function DrawVisualization() {
         a.className = "btn btn-primary";
         document.getElementById('savefilediv').appendChild(a);
 
-    }
+    };
     function drawTable(name) {
         var dict = _jsonprofile[_selectedIP]["time"][_selectedDate][_selectedHour][name];
         if ($('#table_div' + ' .' + name).length == 0) {
@@ -556,6 +563,10 @@ function DrawVisualization() {
             var $tcp = $('<table/>').attr({class: "display table table-striped table-bordered table-hover", type: 'table'});
             $('#sumary_tab').append($tcp);
         }
+        $("#sumary_tab").notify(
+            "Not established features are not yet reliable in summary table",
+            { position:"top",autoHideDelay: 5000,className:"warn" }
+        );
         var array = [];
         for (var feature in dict) {
             array.push([feature, dict[feature]]);

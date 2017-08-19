@@ -53,11 +53,11 @@ def fillFeaturesClassFromTempClass(time):
         ipfeaturesTimeDict = temp[ip]
         temp[ip] = {}
 
-        ipfeaturesTimeDict['hoursummary']['clientNumberOfNonAnsweredConnections'] = len (ipfeaturesTimeDict['clientDictOfNonAnsweredConnections'])
-        ipfeaturesTimeDict['hoursummary']['serverNumberOfNonAnsweredConnections'] = len (ipfeaturesTimeDict['serverDictOfNonAnsweredConnections'])
+        ipfeaturesTimeDict['hoursummary']['clientNumberOfConnectionsNotEstablished'] = len (ipfeaturesTimeDict['clientDictOfConnectionsNotEstablished'])
+        ipfeaturesTimeDict['hoursummary']['serverNumberOfConnectionsNotEstablished'] = len (ipfeaturesTimeDict['serverDictOfConnectionsNotEstablished'])
 
-        ipfeaturesTimeDict['hoursummary']['clientNummberOfDistinctCountries'] = len (ipfeaturesTimeDict['clientDictNumberOfDistinctCountries'])
-        ipfeaturesTimeDict['hoursummary']['clientNummberOfDistinctOrganizations'] = len (ipfeaturesTimeDict['clientDictNumberOfDistinctOrganizations'])
+        ipfeaturesTimeDict['hoursummary']['clientNumberOfDistinctCountriesEstablished'] = len (ipfeaturesTimeDict['clientDictNumberOfDistinctCountriesEstablished'])
+        ipfeaturesTimeDict['hoursummary']['clientNumberOfDistinctOrganizationsEstablished'] = len (ipfeaturesTimeDict['clientDictNumberOfDistinctOrganizationsEstablished'])
 
         if dataDateID in result[ip]['time']:
             result[ip]['time'][dataDateID][dataHourID] = ipfeaturesTimeDict
@@ -72,7 +72,7 @@ def initializeTempHourDict(tempDict):
     initializeNumberFeatureAsServerAsClient(tempDict['hoursummary'],'NumberOfIPFlows')
     initializeNumberFeatureAsServerAsClient(tempDict['hoursummary'],'TotalNumberOfTransferedData')
 
-    initializeDictFeatureAsServerAsClient (tempDict, 'DictOfNonAnsweredConnections')
+    initializeDictFeatureAsServerAsClient (tempDict, 'DictOfConnections')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctCountries')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctOrganizations')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictClassBnetworks')
@@ -81,21 +81,26 @@ def initializeTempHourDict(tempDict):
 
     initializePortFeatures(tempDict)
 
-    tempDict['serverDestinationPortDictIPsTCP'] = {}
-    tempDict['serverDestinationPortDictIPsUDP'] = {}
+    initializeDictFeatureAsServerAsClient (tempDict, 'DestinationPortDictIPsTCP')
+    initializeDictFeatureAsServerAsClient (tempDict, 'DestinationPortDictIPsUDP')
 
-    tempDict['clientDestinationPortDictIPsTCP'] = {}
-    tempDict['clientDestinationPortDictIPsUDP'] = {}
 
 
 
 def initializeDictFeatureAsServerAsClient(dict,name):
-    dict['client' + name] = {}
-    dict['server' + name] = {}
+    dict['client' + name + 'Established'] = {}
+    dict['client' + name + 'NotEstablished'] = {}
+
+    dict['server' + name + 'Established'] = {}
+    dict['server' + name + 'NotEstablished'] = {}
+
 
 def initializeNumberFeatureAsServerAsClient(dict,name):
-    dict['client' + name] = 0
-    dict['server' + name] = 0
+    dict['client' + name + 'Established'] = 0
+    dict['client' + name + 'NotEstablished'] = 0
+
+    dict['server' + name + 'Established'] = 0
+    dict['server' + name + 'NotEstablished'] = 0
 
 def getCountryFromWhoisCache(ip):
     data = whoiscache.get_country_for_ip (ip)
@@ -141,7 +146,7 @@ def processLine(lineDict, lastTimeID):
 #ipDict is ip where the features are added
 def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,sourcePort,dstPort,connectionInformationState,totalPakets,totBytes,srcBytes):
     ipFeaturesTemp = temp[ipDict]
-    ipFeaturesTemp['hoursummary'][clientorserver + 'NumberOfIPFlows'] = ipFeaturesTemp['hoursummary'][clientorserver +'NumberOfIPFlows'] + 1
+    ipFeaturesTemp['hoursummary'][clientorserver + 'NumberOfIPFlowsEstablished'] = ipFeaturesTemp['hoursummary'][clientorserver +'NumberOfIPFlowsEstablished'] + 1
     # ipFeaturesTemp['hoursummary']['numberOfIPFlows'] = ipFeaturesTemp['hoursummary']['numberOfIPFlows'] + 1
     # per flow consumer/producer ratio
     result[ipDict]['perflow']['consumerproducerratio'].add (srcBytes / totBytes)
@@ -150,32 +155,31 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
         #addFeaturesToDict (ipFeaturesTemp, 'clientDictIPSContacted', ipTarget, 1)
         if USEWHOISDATA:
             country = getCountryFromWhoisCache (ipTarget)
-            addFeaturesToDict (ipFeaturesTemp, clientorserver +'DictNumberOfDistinctCountries', country, 1)
-            addFeaturesToDict (ipFeaturesTemp, clientorserver +'DictNumberOfDistinctOrganizations',
+            addFeaturesToDict (ipFeaturesTemp, clientorserver +'DictNumberOfDistinctCountriesEstablished', country, 1)
+            addFeaturesToDict (ipFeaturesTemp, clientorserver +'DictNumberOfDistinctOrganizationsEstablished',
                                whoiscache.get_organization_of_ip (ipTarget), 1)
 
         classB = ipTarget.split ('.')[0] + '.' + ipTarget.split ('.')[1]
-        addFeaturesToDict(ipFeaturesTemp, clientorserver +'DictClassBnetworks', classB, 1)
-        ipFeaturesTemp['hoursummary'][clientorserver+'TotalNumberOfTransferedData'] = ipFeaturesTemp['hoursummary'][
-                                                                        clientorserver+'TotalNumberOfTransferedData'] + totBytes
-        fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict)
+        addFeaturesToDict(ipFeaturesTemp, clientorserver +'DictClassBnetworksEstablished', classB, 1)
+        ipFeaturesTemp['hoursummary'][clientorserver+'TotalNumberOfTransferedDataEstablished'] = ipFeaturesTemp['hoursummary'][
+                                                                        clientorserver+'TotalNumberOfTransferedDataEstablished'] + totBytes
+        fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict,'Established')
     elif (detectConnectionAttemptWithNoAnswer (connectionInformationState)):
-        addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfNonAnsweredConnections', ipTarget, 1)
+        addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfConnectionsNotEstablished', ipTarget, 1)
         #TODO Ask sebas if not answered connections should be in the histograms, make the two colors mode for this
-        fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict)
+        fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict,'NotEstablished')
         #TODO Check log of not used lines that should be catched by this
 
 
-        # ipFeaturesTemp['clientDictOfNonAnsweredConnections'].add (ipTo)
     elif (detectPAPAsituation (connectionInformationState)):
         if detectEndingConection(connectionInformationState):
             #print "Connection ended"
             pass
         else:
-            if ipTarget in ipFeaturesTemp[clientorserver + 'PAPAconections']:
-                ipFeaturesTemp[clientorserver + 'PAPAconections'][ipTarget]+=1
+            if ipTarget in ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished']:
+                ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished'][ipTarget]+=1
             else:
-                ipFeaturesTemp[clientorserver + 'PAPAconections'][ipTarget]=1
+                ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished'][ipTarget]=1
     else:
         print (convertDictToLine(lineDict))
 
@@ -192,32 +196,34 @@ def initializePortFeatures(tempDict):
     d = ['SourcePort', 'DestinationPort']
     f = ['TotalBytes', 'TotalPackets', 'NumberOfFlows']
     p = ['TCP','UDP']
+    e = ['Established','NotEstablished']
     for source in s:
         for port in d:
             for feature in f:
                 for protocol in p:
-                    tempDict[source+port+feature+protocol] = {}
-def fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict):
+                    for established in e:
+                        tempDict[source+port+feature+protocol+established] = {}
+def fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict,answeredornot):
     if clientorserver == 'client':
         portDictIPS = 'clientDestinationPortDictIPs'
     else:
         portDictIPS = 'serverDestinationPortDictIPs'
 
     if protocol == 'tcp':
-        addPortDictIPSToDict (ipFeaturesTemp, portDictIPS + 'TCP', dstPort, ipTarget)
-        addAllPortFeaturesToDict (ipFeaturesTemp, clientorserver, protocol, sourcePort, dstPort, totBytes, totalPakets)
+        addPortDictIPSToDict (ipFeaturesTemp, portDictIPS + 'TCP'+answeredornot, dstPort, ipTarget)
+        addAllPortFeaturesToDict (ipFeaturesTemp, clientorserver, protocol, sourcePort, dstPort, totBytes, totalPakets,answeredornot)
     elif protocol == 'udp':  # udp protocol
-        addPortDictIPSToDict (ipFeaturesTemp, portDictIPS + 'UDP', dstPort, ipTarget)
-        addAllPortFeaturesToDict (ipFeaturesTemp, clientorserver, protocol, sourcePort, dstPort, totBytes, totalPakets)
+        addPortDictIPSToDict (ipFeaturesTemp, portDictIPS + 'UDP'+answeredornot, dstPort, ipTarget)
+        addAllPortFeaturesToDict (ipFeaturesTemp, clientorserver, protocol, sourcePort, dstPort, totBytes, totalPakets,answeredornot)
     else:
         print(convertDictToLine(lineDict))
 
-def addAllPortFeaturesToDict(ipFeaturesTemp,source,protocol,sourcePort,destinationPort,totalBytes,totalPackets):
+def addAllPortFeaturesToDict(ipFeaturesTemp,source,protocol,sourcePort,destinationPort,totalBytes,totalPackets,answeredornot):
     d = {'SourcePort':sourcePort , 'DestinationPort':destinationPort}
     f = {'TotalBytes' : totalBytes, 'TotalPackets' : totalPackets, 'NumberOfFlows':1}
     for port in d:
         for feature in f:
-            nameOfTheFeauture = source+port+feature+protocol.upper()
+            nameOfTheFeauture = source+port+feature+protocol.upper()+answeredornot
             addFeaturesToDict(ipFeaturesTemp, nameOfTheFeauture, d[port], f[feature])
 
 def addFeaturesToDict(ipFeaturesTemp, dictname, data, howmuchadd):

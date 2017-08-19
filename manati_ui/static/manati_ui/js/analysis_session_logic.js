@@ -1260,6 +1260,9 @@ function AnalysisSessionLogic(){
         }
        // _m.EventFileUploadingFinished(_filename);
         draw_viz.showJSON(json);
+        if(document.getElementById('savefilediv')!=null) {
+            draw_viz.exportToFile();
+        }
     };
 
     thiz.parseData = function(file_rows){
