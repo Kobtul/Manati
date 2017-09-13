@@ -73,12 +73,13 @@ def initializeTempHourDict(tempDict):
     initializeNumberFeatureAsServerAsClient(tempDict['hoursummary'],'TotalNumberOfTransferedData')
 
     initializeDictFeatureAsServerAsClient (tempDict, 'DictOfConnections')
-    #tempDict['clientDictOfConnectionsNotEstablished'] = {}
-    #tempDict['serverDictOfConnectionsNotEstablished'] = {}
 
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctCountries')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctOrganizations')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictClassBnetworks')
+    initializeDictFeatureAsServerAsClient (tempDict, 'DictClassBnetworksTCP')
+    initializeDictFeatureAsServerAsClient (tempDict, 'DictClassBnetworksUDP')
+
 
     initializeDictFeatureAsServerAsClient(tempDict,'PAPAconections')
 
@@ -159,6 +160,10 @@ def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,source
                                whoiscache.get_organization_of_ip (ipTarget), 1)
 
         addFeaturesToDict(ipFeaturesTemp, clientorserver +'DictClassBnetworksEstablished', classB, 1)
+        if protocol == 'tcp':
+            addFeaturesToDict(ipFeaturesTemp, clientorserver + 'DictClassBnetworksTCPEstablished', classB, 1)
+        elif protocol == 'udp':
+            addFeaturesToDict(ipFeaturesTemp, clientorserver + 'DictClassBnetworksUDPEstablished', classB, 1)
         addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfConnectionsEstablished', ipTarget, 1)
 
 
