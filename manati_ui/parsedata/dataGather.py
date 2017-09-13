@@ -73,6 +73,9 @@ def initializeTempHourDict(tempDict):
     initializeNumberFeatureAsServerAsClient(tempDict['hoursummary'],'TotalNumberOfTransferedData')
 
     initializeDictFeatureAsServerAsClient (tempDict, 'DictOfConnections')
+    #tempDict['clientDictOfConnectionsNotEstablished'] = {}
+    #tempDict['serverDictOfConnectionsNotEstablished'] = {}
+
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctCountries')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictNumberOfDistinctOrganizations')
     initializeDictFeatureAsServerAsClient (tempDict, 'DictClassBnetworks')
@@ -96,11 +99,8 @@ def initializeDictFeatureAsServerAsClient(dict,name):
 
 
 def initializeNumberFeatureAsServerAsClient(dict,name):
-    dict['client' + name + 'Established'] = 0
-    dict['client' + name + 'NotEstablished'] = 0
-
-    dict['server' + name + 'Established'] = 0
-    dict['server' + name + 'NotEstablished'] = 0
+    dict['client' + name] = 0
+    dict['server' + name] = 0
 
 def getCountryFromWhoisCache(ip):
     data = whoiscache.get_country_for_ip (ip)
@@ -146,40 +146,41 @@ def processLine(lineDict, lastTimeID):
 #ipDict is ip where the features are added
 def addFeaturesForIP(clientorserver,ipDict,ipTarget,lineDict,dur,protocol,sourcePort,dstPort,connectionInformationState,totalPakets,totBytes,srcBytes):
     ipFeaturesTemp = temp[ipDict]
-    ipFeaturesTemp['hoursummary'][clientorserver + 'NumberOfIPFlowsEstablished'] = ipFeaturesTemp['hoursummary'][clientorserver +'NumberOfIPFlowsEstablished'] + 1
-    # ipFeaturesTemp['hoursummary']['numberOfIPFlows'] = ipFeaturesTemp['hoursummary']['numberOfIPFlows'] + 1
-    # per flow consumer/producer ratio
-    result[ipDict]['perflow']['consumerproducerratio'].add (srcBytes / totBytes)
+    ipFeaturesTemp['hoursummary'][clientorserver + 'NumberOfIPFlows'] = ipFeaturesTemp['hoursummary'][clientorserver +'NumberOfIPFlows'] + 1
+    ipFeaturesTemp['hoursummary'][clientorserver + 'TotalNumberOfTransferedData'] = ipFeaturesTemp['hoursummary'][
+                                                                                        clientorserver + 'TotalNumberOfTransferedData'] + totBytes
+    #result[ipDict]['perflow']['consumerproducerratio'].add (srcBytes / totBytes)
+    classB = ipTarget.split('.')[0] + '.' + ipTarget.split('.')[1]
     if (detectConnection (connectionInformationState)):
-        # ipFeaturesTemp['clientDictIPSContacted'].add (ipTo)
-        #addFeaturesToDict (ipFeaturesTemp, 'clientDictIPSContacted', ipTarget, 1)
         if USEWHOISDATA:
             country = getCountryFromWhoisCache (ipTarget)
             addFeaturesToDict (ipFeaturesTemp, clientorserver +'DictNumberOfDistinctCountriesEstablished', country, 1)
             addFeaturesToDict (ipFeaturesTemp, clientorserver +'DictNumberOfDistinctOrganizationsEstablished',
                                whoiscache.get_organization_of_ip (ipTarget), 1)
 
-        classB = ipTarget.split ('.')[0] + '.' + ipTarget.split ('.')[1]
         addFeaturesToDict(ipFeaturesTemp, clientorserver +'DictClassBnetworksEstablished', classB, 1)
-        ipFeaturesTemp['hoursummary'][clientorserver+'TotalNumberOfTransferedDataEstablished'] = ipFeaturesTemp['hoursummary'][
-                                                                        clientorserver+'TotalNumberOfTransferedDataEstablished'] + totBytes
+        addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfConnectionsEstablished', ipTarget, 1)
+
+
         fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict,'Established')
     elif (detectConnectionAttemptWithNoAnswer (connectionInformationState)):
+        if USEWHOISDATA:
+            country = getCountryFromWhoisCache(ipTarget)
+            addFeaturesToDict(ipFeaturesTemp, clientorserver + 'DictNumberOfDistinctCountriesNotEstablished', country, 1)
+            addFeaturesToDict(ipFeaturesTemp, clientorserver + 'DictNumberOfDistinctOrganizationsNotEstablished',
+                              whoiscache.get_organization_of_ip(ipTarget), 1)
+        addFeaturesToDict(ipFeaturesTemp, clientorserver +'DictClassBnetworksNotEstablished', classB, 1)
         addFeaturesToDict (ipFeaturesTemp, clientorserver + 'DictOfConnectionsNotEstablished', ipTarget, 1)
-        #TODO Ask sebas if not answered connections should be in the histograms, make the two colors mode for this
         fillDataToPortFeatures(clientorserver,protocol,ipFeaturesTemp,dstPort,ipTarget,sourcePort,totBytes,totalPakets,lineDict,'NotEstablished')
         #TODO Check log of not used lines that should be catched by this
 
-
+    elif detectEndingConection(connectionInformationState):
+        pass
     elif (detectPAPAsituation (connectionInformationState)):
-        if detectEndingConection(connectionInformationState):
-            #print "Connection ended"
-            pass
+        if ipTarget in ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished']:
+            ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished'][ipTarget]+=1
         else:
-            if ipTarget in ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished']:
-                ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished'][ipTarget]+=1
-            else:
-                ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished'][ipTarget]=1
+            ipFeaturesTemp[clientorserver + 'PAPAconectionsEstablished'][ipTarget]=1
     else:
         print (convertDictToLine(lineDict))
 

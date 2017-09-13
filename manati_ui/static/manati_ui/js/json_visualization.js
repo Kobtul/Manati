@@ -275,10 +275,10 @@ function DrawVisualization() {
                 }
                 //$("#dayprofilecolapse").show();
                 $("#dayprofilecolapse").css('visibility', 'visible');
-                $("#dayprofilecolapse").notify(
-                    "Not established features are not yet reliable in summary",
-                    { position:"top",autoHideDelay: 5000,className:"warn" }
-                );
+                // $("#dayprofilecolapse").notify(
+                //     "Not established features are not yet reliable in summary",
+                //     { position:"top",autoHideDelay: 5000,className:"warn" }
+                // );
             }
     }
     function generateHourLayerOfButtons() {
@@ -563,10 +563,10 @@ function DrawVisualization() {
             var $tcp = $('<table/>').attr({class: "display table table-striped table-bordered table-hover", type: 'table'});
             $('#sumary_tab').append($tcp);
         }
-        $("#sumary_tab").notify(
-            "Not established features are not yet reliable in summary table",
-            { position:"top",autoHideDelay: 5000,className:"warn" }
-        );
+        // $("#sumary_tab").notify(
+        //     "Not established features are not yet reliable in summary table",
+        //     { position:"top",autoHideDelay: 5000,className:"warn" }
+        // );
         var array = [];
         for (var feature in dict) {
             array.push([feature, dict[feature]]);
