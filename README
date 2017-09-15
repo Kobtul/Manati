@@ -15,13 +15,13 @@ The goal of the ManaTi project is to develop machine learning techniques to assi
 ## Authors
 
 - Raul B. Netto (raulbeni@gmail.com )
-- David Kube≈°a(d.kubesa@gmail.com)
+- David Kubeöa(d.kubesa@gmail.com)
 - Sebastian Garcia (sebastian.garcia@agents.fel.cvut.cz, eldraco@gmail.com)
 
 ## Settings: for Installation Zero for deployments
 ManaTI is a django project with a postgres database and it works in Linux and MacOS. We recommend using a virtualenv environment to setup it. The installation steps for linux are:
 
-1. git clone git@bitbucket.org:rbenitez/project_manati.git
+1. git clone --recursive git@bitbucket.org:rbenitez/project_manati.git
 2. apt-get install virtualenv
 3. virtualenv vmanati
 4. source vmanati/bin/activate
