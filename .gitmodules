@@ -1,0 +1,3 @@
+[submodule "manati_ui/parsedata"]
+	path = manati_ui/parsedata
+	url = https://github.com/Kobtul/parse-binet.git
