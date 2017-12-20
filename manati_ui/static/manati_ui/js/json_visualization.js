@@ -509,7 +509,10 @@ function DrawVisualization() {
         var dataTable = new google.visualization.DataTable();
         dataTable.addColumn('string', 'hour');
         dataTable.addColumn('number', 'value');
-        for (var hour in dict){
+        var keys = Object.keys(dict);
+        keys.sort();
+        for (var i=0; i<keys.length; i++) { // now lets iterate in sort order
+            var hour = keys[i];
             dataTable.addRow([hour, dict[hour]["hoursummary"][name]]);
         }
         var parent = document.getElementById("day_graphs_div");
